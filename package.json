@@ -4,8 +4,8 @@
   "description": "Streaming from a Canvas with Filters to an OpenTok Session",
   "main": "index.js",
   "scripts": {
-    "postinstall": "webpack --entry ./src/index.js --output-filename index.js --devtool source-map",
-    "watch": "webpack --entry ./src/index.js --output-filename index.js --devtool source-map --watch",
+    "postinstall": "webpack",
+    "watch": "webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "http-server"
   },
