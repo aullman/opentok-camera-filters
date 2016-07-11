@@ -2,7 +2,7 @@
   "name": "camera-filters",
   "version": "1.0.0",
   "description": "Streaming from a Canvas with Filters to an OpenTok Session",
-  "main": "index.js",
+  "main": "src/filter.js",
   "scripts": {
     "postinstall": "webpack",
     "watch": "webpack --watch",
