@@ -33,12 +33,42 @@ If you're using the face filter you will need to setup the web worker. The worke
 
 A lot of the filters were taken from [tracking.js](https://trackingjs.com).
 
-  * none - no filter
-  * red - give the video a red tint
-  * green - give the video a green tint
-  * blue - give the video a blue tint
-  * grayscale - Converts a colour from a colorspace based on an RGB color model to a grayscale representation of its luminance.
-  * blur - A Gaussian blur (also known as Gaussian smoothing) is the result of blurring an image by a Gaussian function.
-  * sketch - Computes the vertical and horizontal gradients of the image and combines the computed images to find edges in the image.
-  * invert - Inverts the colour in every pixel of the video.
-  * face - Does some face detection using [tracking.js](https://trackingjs.com) and draws an image on top of the face.
+## red
+Give the video a red tint
+
+[![red](images/red.png)]
+
+## green
+Give the video a green tint
+
+[![green](images/green.png)]
+
+## blue
+Give the video a blue tint
+
+[![blue](images/blue.png)]
+
+## grayscale
+Converts a colour from a colorspace based on an RGB color model to a grayscale representation of its luminance.
+
+[![grayscale](images/grayscale.png)]
+
+## blur
+A Gaussian blur (also known as Gaussian smoothing) is the result of blurring an image by a Gaussian function.
+
+[![blur](images/blur.png)]
+
+## sketch
+Computes the vertical and horizontal gradients of the image and combines the computed images to find edges in the image.
+
+[![sketch](images/sketch.png)]
+
+## invert
+Inverts the colour in every pixel of the video.
+
+[![invert](images/invert.png)]
+
+## face
+Does face detection using [tracking.js](https://trackingjs.com) and draws an image on top of the face.
+
+[![face](images/face.png)]

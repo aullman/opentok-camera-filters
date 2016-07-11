@@ -1,3 +1,4 @@
 node_modules/
 js/*
 npm-debug.log
+.DS_Store
