@@ -241,7 +241,8 @@
 	        tmpCanvas.width = canvas.width;
 	        tmpCanvas.height = canvas.height;
 	        image = document.createElement('img');
-	        image.src = imageSrc || '/images/comedy-glasses.png';
+	        image.src = imageSrc ||
+	          'https://aullman.github.io/opentok-camera-filters/images/comedy-glasses.png';
 	      }
 	      tmpCtx.putImageData(imgData, 0, 0);
 	
