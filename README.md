@@ -1,12 +1,16 @@
 # opentok-camera-filters
 library which lets you add visual filters to your OpenTok Publisher.
 
+# [Demo](https://aullman.github.io/opentok-camera-filters/demo.html)
+
 # Usage
+
+You can view the [source code for the demo](https://github.com/aullman/opentok-camera-filters/blob/gh-pages/src/demo.js) for an example of how to use this library.
 
 Include the filters and then initialise with the filter you want to use.
 
 ```javascript
-const filters = require('opentok-camera-filters/filters.js');
+const filters = require('opentok-camera-filters/src/filters.js');
 const filter = require('opentok-camera-filters')(filters.none);
 ```
 
@@ -22,6 +26,8 @@ If you want to change the filter you can use the change method, eg.
 ```javascript
 filter.change(filters.red);
 ```
+
+If you're using the face filter you will need to setup the web worker. The worker expects a file at `'./js/faceWorker.bundle.js'`. The root of that JS file is [src/faceWorker.js](/src/faceWorker.js). So you need to point WebPack or Browserify at that file and put the output in the /js directory of your webserver.
 
 # Available Filters
 
