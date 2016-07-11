@@ -220,7 +220,7 @@
 	        // We create a worker to detect the faces. We can't send the data
 	        // for every frame so we just send the most recent frame every time the
 	        // worker returns
-	        worker = new Worker('/js/faceWorker.bundle.js');
+	        worker = new Worker('./js/faceWorker.bundle.js');
 	        worker.addEventListener('message', event => {
 	          if (event.data.length) {
 	            currentFaces = event.data;
