@@ -1,6 +1,6 @@
 {
   "name": "opentok-camera-filters",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Streaming from a Canvas with Filters to an OpenTok Session",
   "main": "src/filter.js",
   "scripts": {
