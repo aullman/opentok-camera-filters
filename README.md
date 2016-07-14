@@ -1,5 +1,7 @@
 # opentok-camera-filters
-library which lets you add visual filters to your OpenTok Publisher.
+Library which lets you add visual filters to your OpenTok Publisher.
+
+![opentok-camera-filters collage](images/Collage.png)
 
 # [Demo](https://aullman.github.io/opentok-camera-filters/demo.html)
 
