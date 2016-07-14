@@ -1,7 +1,7 @@
 # opentok-camera-filters
 Library which lets you add visual filters to your OpenTok Publisher.
 
-![opentok-camera-filters collage](images/Collage.png)
+![opentok-camera-filters collage](https://github.com/aullman/opentok-camera-filters/raw/master/images/Collage.png)
 
 # [Demo](https://aullman.github.io/opentok-camera-filters/)
 
@@ -38,39 +38,39 @@ A lot of the filters were taken from [tracking.js](https://trackingjs.com).
 ## red
 Give the video a red tint
 
-![red](images/red.png)
+![red](https://github.com/aullman/opentok-camera-filters/raw/master/images/red.png)
 
 ## green
 Give the video a green tint
 
-![green](images/green.png)
+![green](https://github.com/aullman/opentok-camera-filters/raw/master/images/green.png)
 
 ## blue
 Give the video a blue tint
 
-![blue](images/blue.png)
+![blue](https://github.com/aullman/opentok-camera-filters/raw/master/images/blue.png)
 
 ## grayscale
 Converts a colour from a colorspace based on an RGB color model to a grayscale representation of its luminance.
 
-![grayscale](images/grayscale.png)
+![grayscale](https://github.com/aullman/opentok-camera-filters/raw/master/images/grayscale.png)
 
 ## blur
 A Gaussian blur (also known as Gaussian smoothing) is the result of blurring an image by a Gaussian function.
 
-![blur](images/blur.png)
+![blur](https://github.com/aullman/opentok-camera-filters/raw/master/images/blur.png)
 
 ## sketch
 Computes the vertical and horizontal gradients of the image and combines the computed images to find edges in the image.
 
-![sketch](images/sketch.png)
+![sketch](https://github.com/aullman/opentok-camera-filters/raw/master/images/sketch.png)
 
 ## invert
 Inverts the colour in every pixel of the video.
 
-![invert](images/invert.png)
+![invert](https://github.com/aullman/opentok-camera-filters/raw/master/images/invert.png)
 
 ## face
 Does face detection using [tracking.js](https://trackingjs.com) and draws an image on top of the face.
 
-![face](images/face.png)
+![face](https://github.com/aullman/opentok-camera-filters/raw/master/images/face.png)
