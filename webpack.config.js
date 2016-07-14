@@ -1,6 +1,6 @@
 module.exports = {
   entry: {
-    demo: './src/demo.js',
+    index: './src/index.js',
     faceWorker: 'opentok-camera-filters/src/faceWorker.js',
   },
   output: {

@@ -46,8 +46,8 @@
 
 	self.window = self;
 	const tracking = window.tracking = {};
+	__webpack_require__(1);
 	__webpack_require__(2);
-	__webpack_require__(5);
 	
 	let faceTracker;
 	
@@ -68,8 +68,7 @@
 
 
 /***/ },
-/* 1 */,
-/* 2 */
+/* 1 */
 /***/ function(module, exports) {
 
 	/**
@@ -2520,9 +2519,7 @@
 
 
 /***/ },
-/* 3 */,
-/* 4 */,
-/* 5 */
+/* 2 */
 /***/ function(module, exports) {
 
 	/**
