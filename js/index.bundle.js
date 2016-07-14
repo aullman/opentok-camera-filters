@@ -48,7 +48,7 @@
 	const filters = __webpack_require__(3);
 	const filter = __webpack_require__(4)(filters.none);
 	
-	const selector = document.createElement('select');
+	const selector = document.querySelector('select');
 	let f;
 	for (f of Object.keys(filters)) {
 	  const option = document.createElement('option');
@@ -60,8 +60,6 @@
 	selector.addEventListener('change', () => {
 	  filter.change(filters[selector.value]);
 	});
-	
-	document.body.appendChild(selector);
 	
 	
 	// Wait for OT to load before we start using it

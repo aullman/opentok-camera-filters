@@ -2,7 +2,7 @@
 const filters = require('opentok-camera-filters/src/filters.js');
 const filter = require('opentok-camera-filters')(filters.none);
 
-const selector = document.createElement('select');
+const selector = document.querySelector('select');
 let f;
 for (f of Object.keys(filters)) {
   const option = document.createElement('option');
@@ -14,8 +14,6 @@ for (f of Object.keys(filters)) {
 selector.addEventListener('change', () => {
   filter.change(filters[selector.value]);
 });
-
-document.body.appendChild(selector);
 
 
 // Wait for OT to load before we start using it
