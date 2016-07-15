@@ -4,7 +4,8 @@
   "description": "Streaming from a Canvas with Filters to an OpenTok Session",
   "main": "src/filter.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "run-tests",
+    "unit": "karma start tests/karma.conf.js --single-run"
   },
   "keywords": [
     "canvas",
@@ -16,7 +17,15 @@
   "devDependencies": {
     "eslint": "^2.13.0",
     "eslint-config-airbnb-base": "^3.0.1",
-    "eslint-plugin-import": "^1.8.1"
+    "eslint-plugin-import": "^1.8.1",
+    "jasmine-core": "^2.4.1",
+    "karma": "^1.1.1",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-jasmine": "^1.0.2",
+    "karma-webpack": "^1.7.0",
+    "opentok-test-scripts": "^3.0.3",
+    "travis-multirunner": "^3.0.1",
+    "webpack": "^1.13.1"
   },
   "dependencies": {
     "tracking": "^1.1.2"
