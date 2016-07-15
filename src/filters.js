@@ -157,12 +157,6 @@ module.exports = {
       });
       return tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
     };
-    const task = filterTask(videoElement, canvas, filter);
-
-    return {
-      stop: () => {
-        task.stop();
-      },
-    };
+    return filterTask(videoElement, canvas, filter);
   },
 };
