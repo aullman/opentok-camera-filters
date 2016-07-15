@@ -32,6 +32,7 @@ describe('filter', () => {
       const publisher = OT.initPublisher(err => {
         expect(err).toBeFalsy();
         filter.change(filters.invert);
+        filter.change(filters.grayscale);
         done();
       });
       filter.setPublisher(publisher);
