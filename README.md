@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/aullman/opentok-camera-filters.svg?branch=master)](https://travis-ci.org/aullman/opentok-camera-filters)
+
 # opentok-camera-filters
 Library which lets you add visual filters to your OpenTok Publisher.
 
