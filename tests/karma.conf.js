@@ -8,7 +8,7 @@ module.exports = config => {
       '*.js': ['webpack'],
     },
 
-    browsers: ['Chrome_fakeDevices'],
+    browsers: [process.env.BROWSER || 'chrome'],
 
     plugins: [
       'karma-chrome-launcher',
@@ -21,10 +21,17 @@ module.exports = config => {
     },
 
     customLaunchers: {
-      Chrome_fakeDevices: {
+      chrome: {
         base: 'Chrome',
         flags: ['--use-fake-device-for-media-stream',
                 '--use-fake-ui-for-media-stream', '--disable-popup-blocking'],
+      },
+      firefox: {
+        base: 'Firefox',
+        prefs: {
+          'media.navigator.permission.disabled': true,
+          'media.navigator.streams.fake': true,
+        },
       },
     },
 
