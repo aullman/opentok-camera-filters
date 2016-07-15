@@ -20,17 +20,17 @@ selector.addEventListener('change', () => {
 window.addEventListener('load', () => {
   // Simple Hello World App
   const session = OT.initSession('1127',
-    '1_MX4xMTI3fn4xNDY2Mzg4MzI1MjQ0fnVnSGFGYm1TS3VmaitVM0lOdEYrYjVHUX5-');
+    '2_MX4xMTI3fn4xNDY4NTU5MDM0ODY3fjFVbG9QTWlNWHJNcFE2ZThUempHdXhsK35-');
   session.on('streamCreated', event => {
     session.subscribe(event.stream, err => {
       if (err) alert(err.message);
     });
   });
 
-  session.connect('T1==cGFydG5lcl9pZD0xMTI3JnNpZz1mMWVkMDYyMjlkMDdmODVkNmZkYzQwY2M1MGEyMmY1MzdmM' +
-    'zQ2NGNhOnNlc3Npb25faWQ9MV9NWDR4TVRJM2ZuNHhORFkyTXpnNE16STFNalEwZm5WblNHRkdZbTFUUzNWbWFpdFZN' +
-    'MGxPZEVZcllqVkhVWDUtJmNyZWF0ZV90aW1lPTE0NjYzODgzMjUmbm9uY2U9MC40ODk2MTM1ODI4NDU3NzczJnJvbGU' +
-    '9bW9kZXJhdG9yJmV4cGlyZV90aW1lPTE0Njg5ODAzMjU=', err => {
+  session.connect('T1==cGFydG5lcl9pZD0xMTI3JnNpZz1iNzQyM2Q4YjkyZWU2MGE5Yzg2YmM1YTZhMjdjMzJlOTI4' +
+    'ZjI0ZmIyOnNlc3Npb25faWQ9Ml9NWDR4TVRJM2ZuNHhORFk0TlRVNU1ETTBPRFkzZmpGVmJHOVFUV2xOV0hKTmNGRT' +
+    'JaVGhVZW1wSGRYaHNLMzUtJmNyZWF0ZV90aW1lPTE0Njg1NTkwMzUmbm9uY2U9MC4wMDY5MDA4Mzc4Nzc3NjUyOTgm' +
+    'cm9sZT1tb2RlcmF0b3ImZXhwaXJlX3RpbWU9MTQ3MTE1MTAzNQ==', err => {
     if (err) alert(err.message);
     const publisher = session.publish(null, {
       resolution: '320x240',
