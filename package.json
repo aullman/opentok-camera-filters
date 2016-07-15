@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/aullman/opentok-camera-filters#readme",
   "dependencies": {
-    "opentok-camera-filters": "0.0.5"
+    "opentok-camera-filters": "^0.1.1"
   }
 }
