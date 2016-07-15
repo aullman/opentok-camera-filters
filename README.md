@@ -9,6 +9,8 @@ Library which lets you add visual filters to your OpenTok Publisher.
 
 You can view the [source code for the demo](https://github.com/aullman/opentok-camera-filters/blob/gh-pages/src/demo.js) for an example of how to use this library.
 
+**Note:** Make sure you include the opentok-camera-filters code before you include opentok.js.
+
 Include the filters and then initialise with the filter you want to use.
 
 ```javascript
