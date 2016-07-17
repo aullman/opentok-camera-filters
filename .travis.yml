@@ -7,6 +7,8 @@ node_js:
 env:
   matrix:
     - BROWSER=chrome  BVER=stable
+    - BROWSER=firefox BVER=stable
+    - BROWSER=chrome  BVER=unstable
     - BROWSER=firefox BVER=unstable
 
   global:
@@ -16,6 +18,7 @@ env:
 
 matrix:
   fast_finish: true
+
 
 before_script:
   - ./node_modules/travis-multirunner/setup.sh
