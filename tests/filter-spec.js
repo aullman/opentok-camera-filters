@@ -1,6 +1,7 @@
-/* global describe it expect OT beforeEach SESSION_ID TOKEN API_KEY */
+/* global describe it expect OT beforeEach SESSION_ID TOKEN API_KEY jasmine */
 const filters = require('../src/filters.js');
 const filter = require('../src/filter.js')(filters.none);
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
 describe('filter', () => {
   it('defines a setPublisher method', () => {
@@ -47,10 +48,10 @@ describe('filter', () => {
         const publisher = session.publish(pubErr => {
           expect(pubErr).toBeFalsy();
           session.disconnect();
+          done();
         });
         filter.setPublisher(publisher);
       });
-      session.on('sessionDisconnected', done);
     });
   });
 });
