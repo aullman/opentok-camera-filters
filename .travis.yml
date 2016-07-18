@@ -15,6 +15,8 @@ env:
   - TRAVIS=true
   - UNIT_CMD='npm run unit'
   - INTEGRATION_CMD=''
+  - OT_API_KEY='44935341'
+  - OT_SESSION_ID='1_MX40NDkzNTM0MX5-MTQ2ODgwODY2NjQxOH56NWdGQk9OSi9wKyt5YVpqbDJUTnZOV2Z-fg'
 
 matrix:
   fast_finish: true

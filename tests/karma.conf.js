@@ -1,3 +1,13 @@
+const OpenTok = require('opentok');
+const opentok = new OpenTok(process.env.OT_API_KEY, process.env.OT_API_SECRET);
+const webpack = require('webpack');
+
+const globalVars = {
+  API_KEY: JSON.stringify(process.env.OT_API_KEY),
+  SESSION_ID: JSON.stringify(process.env.OT_SESSION_ID),
+  TOKEN: JSON.stringify(opentok.generateToken(process.env.OT_SESSION_ID)),
+};
+
 module.exports = config => {
   config.set({
     frameworks: ['jasmine'],
@@ -19,6 +29,9 @@ module.exports = config => {
 
     webpack: {
       devtool: 'inline-source-map',
+      plugins: [
+        new webpack.DefinePlugin(globalVars),
+      ],
     },
 
     customLaunchers: {

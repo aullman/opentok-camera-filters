@@ -1,4 +1,4 @@
-/* global describe it expect OT beforeEach */
+/* global describe it expect OT beforeEach SESSION_ID TOKEN API_KEY */
 const filters = require('../src/filters.js');
 const filter = require('../src/filter.js')(filters.none);
 
@@ -23,6 +23,7 @@ describe('filter', () => {
     it('successfully publishes', done => {
       const publisher = OT.initPublisher(err => {
         expect(err).toBeFalsy();
+        publisher.destroy();
         done();
       });
       filter.setPublisher(publisher);
@@ -33,9 +34,23 @@ describe('filter', () => {
         expect(err).toBeFalsy();
         filter.change(filters.invert);
         filter.change(filters.grayscale);
+        publisher.destroy();
         done();
       });
       filter.setPublisher(publisher);
+    });
+
+    it('can be published to a session', done => {
+      const session = OT.initSession(API_KEY, SESSION_ID);
+      session.connect(TOKEN, err => {
+        expect(err).toBeFalsy();
+        const publisher = session.publish(pubErr => {
+          expect(pubErr).toBeFalsy();
+          session.disconnect();
+        });
+        filter.setPublisher(publisher);
+      });
+      session.on('sessionDisconnected', done);
     });
   });
 });
