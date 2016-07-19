@@ -78,3 +78,29 @@ Inverts the colour in every pixel of the video.
 Does face detection using [tracking.js](https://trackingjs.com) and draws an image on top of the face.
 
 ![face](https://github.com/aullman/opentok-camera-filters/raw/master/images/face.png)
+
+# Custom Filters
+
+If you want to create your own custom filter you just need to create a function that looks like one of the functions in the [filters.js](src/filters.js) file. These functions accept a videoElement and a canvas parameter and they take the data out of the videoElement which is rendering the unfiltered video from the camera and they draw it onto the canvas after applying a filter. It should return an object with a stop method which when called will stop the filter from processing. For example creating a simple filter which draws a new random colour every second would look something like:
+
+```javascript
+const randomColour = () => {
+  return Math.round(Math.random() * 255);
+};
+
+filter.change((videoElement, canvas) => {
+  const interval = setInterval(() => {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = `rgb(${randomColour()}, ${randomColour()}, ${randomColour()})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }, 1000);
+  return {
+    stop: () => {
+      clearInterval(interval);
+    }
+  };
+});
+```
+
+You can also use the [filterTask](src/filterTask.js) which handles transforming image data from the videoElement and just lets you pass it a filter function which takes ImageData and transforms it returning new ImageData. The [invert function](https://github.com/aullman/opentok-camera-filters/blob/a845d2f4eec8a8a6bea86c3a785ef089656d861f/src/filters.js#L92) is a good example of a simple filter which uses this. 
