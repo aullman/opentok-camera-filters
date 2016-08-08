@@ -47,7 +47,9 @@ module.exports = iFilter => {
       pubEl.appendChild(canvas);
       publisher.on('destroyed', () => {
         // Stop running the filter
-        selectedFilter.stop();
+        if (selectedFilter) {
+          selectedFilter.stop();
+        }
       });
     },
     change: filter => {
