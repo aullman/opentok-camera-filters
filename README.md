@@ -7,6 +7,15 @@ Library which lets you add visual filters to your OpenTok Publisher.
 
 # [Demo](https://aullman.github.io/opentok-camera-filters/)
 
+# [Blog Post](http://www.tokbox.com/blog/camera-filters-in-opentok-for-web/)
+
+# Browser Support
+
+* Chrome 51+
+* Firefox 49+
+
+These filters require the Canvas [captureStream API](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream) which works in Chrome 51+ and Firefox 43+. Unfortunately adding audio to the stream doesn't work until Firefox 49+. This is why currently [the tests](https://travis-ci.org/aullman/opentok-camera-filters.svg?branch=master) only run in Firefox nightly.
+
 # Usage
 
 You can view the [source code for the demo](https://github.com/aullman/opentok-camera-filters/blob/gh-pages/src/demo.js) for an example of how to use this library.
