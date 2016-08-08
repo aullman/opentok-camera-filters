@@ -1,4 +1,4 @@
-/* global describe it expect OT beforeEach SESSION_ID TOKEN API_KEY jasmine */
+/* global describe it expect OT beforeEach SESSION_ID TOKEN API_KEY jasmine spyOn */
 const filters = require('../src/filters.js');
 const filter = require('../src/filter.js')(filters.none);
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -24,8 +24,26 @@ describe('filter', () => {
     it('successfully publishes', done => {
       const publisher = OT.initPublisher(err => {
         expect(err).toBeFalsy();
+        publisher.on('destroyed', done);
         publisher.destroy();
-        done();
+      });
+      filter.setPublisher(publisher);
+    });
+
+    it('stops drawing frames when the publisher is destroyed', done => {
+      spyOn(window, 'requestAnimationFrame').and.callThrough();
+      const publisher = OT.initPublisher(err => {
+        expect(err).toBeFalsy();
+        publisher.on('destroyed', () => {
+          // Check that filterTask isn't still being called after we destroyed the publisher
+          const callCount = window.requestAnimationFrame.calls.count();
+          expect(callCount).toBeGreaterThan(0);
+          setTimeout(() => {
+            expect(window.requestAnimationFrame.calls.count()).toBe(callCount);
+            done();
+          }, 100);
+        });
+        publisher.destroy();
       });
       filter.setPublisher(publisher);
     });
@@ -35,8 +53,8 @@ describe('filter', () => {
         expect(err).toBeFalsy();
         filter.change(filters.invert);
         filter.change(filters.grayscale);
+        publisher.on('destroyed', done);
         publisher.destroy();
-        done();
       });
       filter.setPublisher(publisher);
     });
@@ -47,8 +65,9 @@ describe('filter', () => {
         expect(err).toBeFalsy();
         const publisher = session.publish(pubErr => {
           expect(pubErr).toBeFalsy();
+          publisher.on('destroyed', done);
           session.disconnect();
-          done();
+          publisher.destroy();
         });
         filter.setPublisher(publisher);
       });

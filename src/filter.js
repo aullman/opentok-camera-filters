@@ -9,10 +9,8 @@ let initialFilter;
 
 // Mock out getUserMedia and replace the stream with the canvas.captureStream()
 mockGetUserMedia(stream => {
-  if (!videoElement) {
-    videoElement = document.createElement('video');
-    videoElement.muted = 'true';
-  }
+  videoElement = document.createElement('video');
+  videoElement.muted = 'true';
   videoElement.src = URL.createObjectURL(stream);
 
   videoElement.addEventListener('loadedmetadata', () => {
@@ -47,6 +45,10 @@ module.exports = iFilter => {
       // with Canvas elements that are visible and in the DOM.
       const pubEl = document.querySelector(`#${publisher.id}`);
       pubEl.appendChild(canvas);
+      publisher.on('destroyed', () => {
+        // Stop running the filter
+        selectedFilter.stop();
+      });
     },
     change: filter => {
       if (selectedFilter) {
