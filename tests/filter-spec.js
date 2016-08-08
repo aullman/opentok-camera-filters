@@ -65,8 +65,9 @@ describe('filter', () => {
         expect(err).toBeFalsy();
         const publisher = session.publish(pubErr => {
           expect(pubErr).toBeFalsy();
-          publisher.on('destroyed', done);
+          publisher.on('destroyed');
           session.disconnect();
+          done();
         });
         filter.setPublisher(publisher);
       });
