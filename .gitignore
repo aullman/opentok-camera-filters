@@ -1,4 +1,4 @@
 node_modules/
-js/*
 npm-debug.log
 .DS_Store
+/demo/js/*

@@ -1,0 +1,24 @@
+{
+  "name": "opentok-camera-filters-demo",
+  "version": "0.0.2",
+  "description": "Demo of the opentok-camera-filters",
+  "main": "src/demo.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "webpack",
+    "watch": "webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aullman/opentok-camera-filters.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aullman/opentok-camera-filters/issues"
+  },
+  "homepage": "https://github.com/aullman/opentok-camera-filters#readme",
+  "dependencies": {
+    "opentok-camera-filters": "^0.1.1"
+  }
+}
