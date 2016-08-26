@@ -46,7 +46,7 @@
 
 	/* global OT */
 	const filters = __webpack_require__(3);
-	const filter = __webpack_require__(5)(filters.none);
+	const filter = __webpack_require__(4)(filters.none);
 	
 	const selector = document.querySelector('select');
 	let f;
@@ -2541,7 +2541,6 @@
 
 	const tracking = window.tracking = {};
 	__webpack_require__(1);
-	const filterTask = __webpack_require__(4);
 	
 	function colourShift(r, g, b, a, imgData) {
 	  const res = new Uint8ClampedArray(imgData.data.length);
@@ -2553,6 +2552,46 @@
 	  }
 	  const resData = new ImageData(res, imgData.width, imgData.height);
 	  return resData;
+	}
+	
+	function filterTask(videoElement, canvas, selectedFilter) {
+	  let tmpCanvas;
+	  let tmpCtx;
+	  let ctx;
+	  let stopped = false;
+	
+	  // Draws a frame on the specified canvas after applying the selected filter every
+	  // requestAnimationFrame
+	  const drawFrame = function drawFrame() {
+	    if (!ctx) {
+	      ctx = canvas.getContext('2d');
+	    }
+	    if (!tmpCanvas) {
+	      tmpCanvas = document.createElement('canvas');
+	      tmpCtx = tmpCanvas.getContext('2d');
+	      tmpCanvas.width = canvas.width;
+	      tmpCanvas.height = canvas.height;
+	    }
+	    tmpCtx.drawImage(videoElement, 0, 0, tmpCanvas.width, tmpCanvas.height);
+	    const imgData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
+	    const data = selectedFilter(imgData);
+	    ctx.putImageData(data, 0, 0);
+	    if (!stopped) {
+	      requestAnimationFrame(drawFrame);
+	    } else {
+	      tmpCanvas = null;
+	      tmpCtx = null;
+	      ctx = null;
+	    }
+	  };
+	
+	  requestAnimationFrame(drawFrame);
+	
+	  return {
+	    stop: () => {
+	      stopped = true;
+	    },
+	  };
 	}
 	
 	function colourFilter(r, g, b, a, videoElement, canvas) {
@@ -2617,7 +2656,6 @@
 	    const createMessage = function createMessage(dataArray) {
 	      return {
 	        array: dataArray,
-	        type: 'face',
 	        width: canvas.width,
 	        height: canvas.height,
 	      };
@@ -2651,64 +2689,7 @@
 	        tmpCanvas.height = canvas.height;
 	        image = document.createElement('img');
 	        image.src = imageSrc ||
-	          'http://localhost:8080/opentok-camera-filters/images/comedy-glasses.png';
-	      }
-	      tmpCtx.putImageData(imgData, 0, 0);
-	
-	      currentFaces.forEach(rect => {
-	        tmpCtx.drawImage(image, rect.x, rect.y, rect.width, rect.height);
-	      });
-	      return tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
-	    };
-	    return filterTask(videoElement, canvas, filter);
-	  },
-	  greenEyes: function greenEyes(videoElement, canvas, imageSrc) {
-	    // Draw on the canvas with no filter every requestAnimationFrame
-	    let tmpCanvas;
-	    let tmpCtx;
-	    let image;
-	    let currentEyes = [];
-	    let currentMessage;
-	    let worker;
-	
-	    const createMessage = function createMessage(dataArray) {
-	      return {
-	        array: dataArray,
-	        type: 'eye',
-	        width: canvas.width,
-	        height: canvas.height,
-	      };
-	    };
-	
-	    const filter = imgData => {
-	      currentMessage = createMessage(imgData.data);
-	      if (!worker) {
-	        // We create a worker to detect the faces. We can't send the data
-	        // for every frame so we just send the most recent frame every time the
-	        // worker returns
-	        worker = new Worker('./js/faceWorker.bundle.js');
-	        worker.addEventListener('message', event => {
-	          if (event.data.length) {
-	            currentEyes = event.data;
-	          } else {
-	            currentEyes = [];
-	          }
-	          if (currentMessage) {
-	            worker.postMessage(currentMessage);
-	          }
-	        });
-	
-	        worker.postMessage(currentMessage);
-	      }
-	
-	      if (!tmpCanvas) {
-	        tmpCanvas = document.createElement('canvas');
-	        tmpCtx = tmpCanvas.getContext('2d');
-	        tmpCanvas.width = canvas.width;
-	        tmpCanvas.height = canvas.height;
-	        image = document.createElement('img');
-	        image.src = imageSrc ||
-	          'http://localhost:8080/opentok-camera-filters/images/comedy-glasses.png';
+	          'https://aullman.github.io/opentok-camera-filters/images/comedy-glasses.png';
 	      }
 	      tmpCtx.putImageData(imgData, 0, 0);
 	
@@ -2724,54 +2705,9 @@
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
-
-	module.exports = function filterTask(videoElement, canvas, selectedFilter) {
-	  let tmpCanvas;
-	  let tmpCtx;
-	  let ctx;
-	  let stopped = false;
-	
-	  // Draws a frame on the specified canvas after applying the selected filter every
-	  // requestAnimationFrame
-	  const drawFrame = function drawFrame() {
-	    if (!ctx) {
-	      ctx = canvas.getContext('2d');
-	    }
-	    if (!tmpCanvas) {
-	      tmpCanvas = document.createElement('canvas');
-	      tmpCtx = tmpCanvas.getContext('2d');
-	      tmpCanvas.width = canvas.width;
-	      tmpCanvas.height = canvas.height;
-	    }
-	    tmpCtx.drawImage(videoElement, 0, 0, tmpCanvas.width, tmpCanvas.height);
-	    const imgData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
-	    const data = selectedFilter(imgData);
-	    ctx.putImageData(data, 0, 0);
-	    if (!stopped) {
-	      requestAnimationFrame(drawFrame);
-	    } else {
-	      tmpCanvas = null;
-	      tmpCtx = null;
-	      ctx = null;
-	    }
-	  };
-	
-	  requestAnimationFrame(drawFrame);
-	
-	  return {
-	    stop: () => {
-	      stopped = true;
-	    },
-	  };
-	};
-
-
-/***/ },
-/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	const mockGetUserMedia = __webpack_require__(6);
+	const mockGetUserMedia = __webpack_require__(5);
 	
 	const canvas = document.createElement('canvas');
 	canvas.getContext('2d');  // Necessary or Firefox complains
@@ -2782,8 +2718,10 @@
 	
 	// Mock out getUserMedia and replace the stream with the canvas.captureStream()
 	mockGetUserMedia(stream => {
-	  videoElement = document.createElement('video');
-	  videoElement.muted = 'true';
+	  if (!videoElement) {
+	    videoElement = document.createElement('video');
+	    videoElement.muted = 'true';
+	  }
 	  videoElement.src = URL.createObjectURL(stream);
 	
 	  videoElement.addEventListener('loadedmetadata', () => {
@@ -2818,12 +2756,6 @@
 	      // with Canvas elements that are visible and in the DOM.
 	      const pubEl = document.querySelector(`#${publisher.id}`);
 	      pubEl.appendChild(canvas);
-	      publisher.on('destroyed', () => {
-	        // Stop running the filter
-	        if (selectedFilter) {
-	          selectedFilter.stop();
-	        }
-	      });
 	    },
 	    change: filter => {
 	      if (selectedFilter) {
@@ -2836,7 +2768,7 @@
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports) {
 
 	
