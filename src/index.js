@@ -1,6 +1,8 @@
 /* global OT */
-const filters = require('opentok-camera-filters/src/filters.js');
-const filter = require('opentok-camera-filters')(filters.none);
+// A real app would use require('opentok-filters/src/filters.js');
+const filters = require('../../src/filters.js');
+// A real app would use require('opentok-filters')(filters.none);
+const filter = require('../..')(filters.none);
 
 const selector = document.querySelector('select');
 let f;
