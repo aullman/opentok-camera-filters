@@ -46,7 +46,7 @@
 
 	/* global OT */
 	const filters = __webpack_require__(3);
-	const filter = __webpack_require__(4)(filters.none);
+	const filter = __webpack_require__(5)(filters.none);
 	
 	const selector = document.querySelector('select');
 	let f;
@@ -66,17 +66,14 @@
 	window.addEventListener('load', () => {
 	  // Simple Hello World App
 	  const session = OT.initSession('1127',
-	    '1_MX4xMTI3fn4xNDY2Mzg4MzI1MjQ0fnVnSGFGYm1TS3VmaitVM0lOdEYrYjVHUX5-');
+	    '2_MX4xMTI3fn4xNDcyMTcxNjQxMDc2fkpNc1N0cDRCdzIwQXdidkhGVEZickpDMX5-');
 	  session.on('streamCreated', event => {
 	    session.subscribe(event.stream, err => {
 	      if (err) alert(err.message);
 	    });
 	  });
 	
-	  session.connect('T1==cGFydG5lcl9pZD0xMTI3JnNpZz1mMWVkMDYyMjlkMDdmODVkNmZkYzQwY2M1MGEyMmY1MzdmM' +
-	    'zQ2NGNhOnNlc3Npb25faWQ9MV9NWDR4TVRJM2ZuNHhORFkyTXpnNE16STFNalEwZm5WblNHRkdZbTFUUzNWbWFpdFZN' +
-	    'MGxPZEVZcllqVkhVWDUtJmNyZWF0ZV90aW1lPTE0NjYzODgzMjUmbm9uY2U9MC40ODk2MTM1ODI4NDU3NzczJnJvbGU' +
-	    '9bW9kZXJhdG9yJmV4cGlyZV90aW1lPTE0Njg5ODAzMjU=', err => {
+	  session.connect('T1==cGFydG5lcl9pZD0xMTI3JnNpZz1mMzAyMTc0N2NjMTA3YjZkZWYzOGI1Y2VmOGI0OWM2MjFlMWQ4YWM0OnNlc3Npb25faWQ9Ml9NWDR4TVRJM2ZuNHhORGN5TVRjeE5qUXhNRGMyZmtwTmMxTjBjRFJDZHpJd1FYZGlka2hHVkVaaWNrcERNWDUtJmNyZWF0ZV90aW1lPTE0NzIxNzE2NDEmbm9uY2U9MC41OTQzMTAwNDI5ODc2Mjg3JnJvbGU9bW9kZXJhdG9yJmV4cGlyZV90aW1lPTE0NzQ3NjM2NDE=', err => {
 	    if (err) alert(err.message);
 	    const publisher = session.publish(null, {
 	      resolution: '320x240',
@@ -2544,6 +2541,7 @@
 
 	const tracking = window.tracking = {};
 	__webpack_require__(1);
+	const filterTask = __webpack_require__(4);
 	
 	function colourShift(r, g, b, a, imgData) {
 	  const res = new Uint8ClampedArray(imgData.data.length);
@@ -2555,46 +2553,6 @@
 	  }
 	  const resData = new ImageData(res, imgData.width, imgData.height);
 	  return resData;
-	}
-	
-	function filterTask(videoElement, canvas, selectedFilter) {
-	  let tmpCanvas;
-	  let tmpCtx;
-	  let ctx;
-	  let stopped = false;
-	
-	  // Draws a frame on the specified canvas after applying the selected filter every
-	  // requestAnimationFrame
-	  const drawFrame = function drawFrame() {
-	    if (!ctx) {
-	      ctx = canvas.getContext('2d');
-	    }
-	    if (!tmpCanvas) {
-	      tmpCanvas = document.createElement('canvas');
-	      tmpCtx = tmpCanvas.getContext('2d');
-	      tmpCanvas.width = canvas.width;
-	      tmpCanvas.height = canvas.height;
-	    }
-	    tmpCtx.drawImage(videoElement, 0, 0, tmpCanvas.width, tmpCanvas.height);
-	    const imgData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
-	    const data = selectedFilter(imgData);
-	    ctx.putImageData(data, 0, 0);
-	    if (!stopped) {
-	      requestAnimationFrame(drawFrame);
-	    } else {
-	      tmpCanvas = null;
-	      tmpCtx = null;
-	      ctx = null;
-	    }
-	  };
-	
-	  requestAnimationFrame(drawFrame);
-	
-	  return {
-	    stop: () => {
-	      stopped = true;
-	    },
-	  };
 	}
 	
 	function colourFilter(r, g, b, a, videoElement, canvas) {
@@ -2659,6 +2617,7 @@
 	    const createMessage = function createMessage(dataArray) {
 	      return {
 	        array: dataArray,
+	        type: 'face',
 	        width: canvas.width,
 	        height: canvas.height,
 	      };
@@ -2692,7 +2651,7 @@
 	        tmpCanvas.height = canvas.height;
 	        image = document.createElement('img');
 	        image.src = imageSrc ||
-	          'https://aullman.github.io/opentok-camera-filters/images/comedy-glasses.png';
+	          'http://localhost:8080/opentok-camera-filters/images/comedy-glasses.png';
 	      }
 	      tmpCtx.putImageData(imgData, 0, 0);
 	
@@ -2701,22 +2660,118 @@
 	      });
 	      return tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
 	    };
-	    const task = filterTask(videoElement, canvas, filter);
+	    return filterTask(videoElement, canvas, filter);
+	  },
+	  greenEyes: function greenEyes(videoElement, canvas, imageSrc) {
+	    // Draw on the canvas with no filter every requestAnimationFrame
+	    let tmpCanvas;
+	    let tmpCtx;
+	    let image;
+	    let currentEyes = [];
+	    let currentMessage;
+	    let worker;
 	
-	    return {
-	      stop: () => {
-	        task.stop();
-	      },
+	    const createMessage = function createMessage(dataArray) {
+	      return {
+	        array: dataArray,
+	        type: 'eye',
+	        width: canvas.width,
+	        height: canvas.height,
+	      };
 	    };
+	
+	    const filter = imgData => {
+	      currentMessage = createMessage(imgData.data);
+	      if (!worker) {
+	        // We create a worker to detect the faces. We can't send the data
+	        // for every frame so we just send the most recent frame every time the
+	        // worker returns
+	        worker = new Worker('./js/faceWorker.bundle.js');
+	        worker.addEventListener('message', event => {
+	          if (event.data.length) {
+	            currentEyes = event.data;
+	          } else {
+	            currentEyes = [];
+	          }
+	          if (currentMessage) {
+	            worker.postMessage(currentMessage);
+	          }
+	        });
+	
+	        worker.postMessage(currentMessage);
+	      }
+	
+	      if (!tmpCanvas) {
+	        tmpCanvas = document.createElement('canvas');
+	        tmpCtx = tmpCanvas.getContext('2d');
+	        tmpCanvas.width = canvas.width;
+	        tmpCanvas.height = canvas.height;
+	        image = document.createElement('img');
+	        image.src = imageSrc ||
+	          'http://localhost:8080/opentok-camera-filters/images/comedy-glasses.png';
+	      }
+	      tmpCtx.putImageData(imgData, 0, 0);
+	
+	      currentFaces.forEach(rect => {
+	        tmpCtx.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+	      });
+	      return tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
+	    };
+	    return filterTask(videoElement, canvas, filter);
 	  },
 	};
 
 
 /***/ },
 /* 4 */
+/***/ function(module, exports) {
+
+	module.exports = function filterTask(videoElement, canvas, selectedFilter) {
+	  let tmpCanvas;
+	  let tmpCtx;
+	  let ctx;
+	  let stopped = false;
+	
+	  // Draws a frame on the specified canvas after applying the selected filter every
+	  // requestAnimationFrame
+	  const drawFrame = function drawFrame() {
+	    if (!ctx) {
+	      ctx = canvas.getContext('2d');
+	    }
+	    if (!tmpCanvas) {
+	      tmpCanvas = document.createElement('canvas');
+	      tmpCtx = tmpCanvas.getContext('2d');
+	      tmpCanvas.width = canvas.width;
+	      tmpCanvas.height = canvas.height;
+	    }
+	    tmpCtx.drawImage(videoElement, 0, 0, tmpCanvas.width, tmpCanvas.height);
+	    const imgData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
+	    const data = selectedFilter(imgData);
+	    ctx.putImageData(data, 0, 0);
+	    if (!stopped) {
+	      requestAnimationFrame(drawFrame);
+	    } else {
+	      tmpCanvas = null;
+	      tmpCtx = null;
+	      ctx = null;
+	    }
+	  };
+	
+	  requestAnimationFrame(drawFrame);
+	
+	  return {
+	    stop: () => {
+	      stopped = true;
+	    },
+	  };
+	};
+
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	const mockGetUserMedia = __webpack_require__(5);
+	const mockGetUserMedia = __webpack_require__(6);
 	
 	const canvas = document.createElement('canvas');
 	canvas.getContext('2d');  // Necessary or Firefox complains
@@ -2727,10 +2782,8 @@
 	
 	// Mock out getUserMedia and replace the stream with the canvas.captureStream()
 	mockGetUserMedia(stream => {
-	  if (!videoElement) {
-	    videoElement = document.createElement('video');
-	    // document.body.appendChild(videoElement);
-	  }
+	  videoElement = document.createElement('video');
+	  videoElement.muted = 'true';
 	  videoElement.src = URL.createObjectURL(stream);
 	
 	  videoElement.addEventListener('loadedmetadata', () => {
@@ -2743,7 +2796,14 @@
 	    }
 	  });
 	
-	  return canvas.captureStream();
+	  const canvasStream = canvas.captureStream();
+	  if (stream.getAudioTracks().length) {
+	    // Add the audio track to the stream
+	    // This actually doesn't work in Firefox until version 49
+	    // https://bugzilla.mozilla.org/show_bug.cgi?id=1271669
+	    canvasStream.addTrack(stream.getAudioTracks()[0]);
+	  }
+	  return canvasStream;
 	});
 	
 	
@@ -2758,6 +2818,12 @@
 	      // with Canvas elements that are visible and in the DOM.
 	      const pubEl = document.querySelector(`#${publisher.id}`);
 	      pubEl.appendChild(canvas);
+	      publisher.on('destroyed', () => {
+	        // Stop running the filter
+	        if (selectedFilter) {
+	          selectedFilter.stop();
+	        }
+	      });
 	    },
 	    change: filter => {
 	      if (selectedFilter) {
@@ -2770,7 +2836,7 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports) {
 
 	

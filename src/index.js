@@ -1,6 +1,6 @@
 /* global OT */
-const filters = require('opentok-camera-filters/src/filters.js');
-const filter = require('opentok-camera-filters')(filters.none);
+const filters = require('../opentok-camera-filters/src/filters.js');
+const filter = require('../opentok-camera-filters')(filters.none);
 
 const selector = document.querySelector('select');
 let f;
@@ -20,17 +20,14 @@ selector.addEventListener('change', () => {
 window.addEventListener('load', () => {
   // Simple Hello World App
   const session = OT.initSession('1127',
-    '1_MX4xMTI3fn4xNDY2Mzg4MzI1MjQ0fnVnSGFGYm1TS3VmaitVM0lOdEYrYjVHUX5-');
+    '2_MX4xMTI3fn4xNDcyMTcxNjQxMDc2fkpNc1N0cDRCdzIwQXdidkhGVEZickpDMX5-');
   session.on('streamCreated', event => {
     session.subscribe(event.stream, err => {
       if (err) alert(err.message);
     });
   });
 
-  session.connect('T1==cGFydG5lcl9pZD0xMTI3JnNpZz1mMWVkMDYyMjlkMDdmODVkNmZkYzQwY2M1MGEyMmY1MzdmM' +
-    'zQ2NGNhOnNlc3Npb25faWQ9MV9NWDR4TVRJM2ZuNHhORFkyTXpnNE16STFNalEwZm5WblNHRkdZbTFUUzNWbWFpdFZN' +
-    'MGxPZEVZcllqVkhVWDUtJmNyZWF0ZV90aW1lPTE0NjYzODgzMjUmbm9uY2U9MC40ODk2MTM1ODI4NDU3NzczJnJvbGU' +
-    '9bW9kZXJhdG9yJmV4cGlyZV90aW1lPTE0Njg5ODAzMjU=', err => {
+  session.connect('T1==cGFydG5lcl9pZD0xMTI3JnNpZz1mMzAyMTc0N2NjMTA3YjZkZWYzOGI1Y2VmOGI0OWM2MjFlMWQ4YWM0OnNlc3Npb25faWQ9Ml9NWDR4TVRJM2ZuNHhORGN5TVRjeE5qUXhNRGMyZmtwTmMxTjBjRFJDZHpJd1FYZGlka2hHVkVaaWNrcERNWDUtJmNyZWF0ZV90aW1lPTE0NzIxNzE2NDEmbm9uY2U9MC41OTQzMTAwNDI5ODc2Mjg3JnJvbGU9bW9kZXJhdG9yJmV4cGlyZV90aW1lPTE0NzQ3NjM2NDE=', err => {
     if (err) alert(err.message);
     const publisher = session.publish(null, {
       resolution: '320x240',
