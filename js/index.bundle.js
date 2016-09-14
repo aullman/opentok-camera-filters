@@ -74,7 +74,7 @@
 	    });
 	  });
 	
-	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9ZjAzMTAzMTBmYTM4YjZjZTQ3ZjdmY2FlZGY4YWM3MmJhNTA2NWNmNTpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDczNzQ3MDQxJm5vbmNlPTAuOTA1Mzc3MDA3Nzg4MDQ3MiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDczOTE5ODQx"), err => {
+	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9MzdkMGRkM2IwM2IyZDJlY2EyOTQ4NDA0YzE3YTk0NzJjZDFhNDcyNjpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDczODMzMzE1Jm5vbmNlPTAuOTI5NTU5NTIwMjEyOTMzNCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0MDA2MTE1"), err => {
 	    if (err) alert(err.message);
 	    const publisher = session.publish(null, {
 	      resolution: '320x240',
