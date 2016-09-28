@@ -21,15 +21,6 @@ describe('filter', () => {
       document.body.appendChild(script);
     });
 
-    it('successfully publishes', done => {
-      const publisher = OT.initPublisher(err => {
-        expect(err).toBeFalsy();
-        publisher.on('destroyed', done);
-        publisher.destroy();
-      });
-      filter.setPublisher(publisher);
-    });
-
     it('stops drawing frames when the publisher is destroyed', done => {
       spyOn(window, 'requestAnimationFrame').and.callThrough();
       const publisher = OT.initPublisher(err => {
@@ -43,6 +34,17 @@ describe('filter', () => {
             done();
           }, 100);
         });
+        setTimeout(() => {
+          publisher.destroy();
+        }, 1000);
+      });
+      filter.setPublisher(publisher);
+    });
+
+    it('successfully publishes', done => {
+      const publisher = OT.initPublisher(err => {
+        expect(err).toBeFalsy();
+        publisher.on('destroyed', done);
         publisher.destroy();
       });
       filter.setPublisher(publisher);
