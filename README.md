@@ -14,7 +14,7 @@ Library which lets you add visual filters to your OpenTok Publisher.
 * Chrome 51+
 * Firefox 49+
 
-These filters require the Canvas [captureStream API](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream) which works in Chrome 51+ and Firefox 43+. Unfortunately adding audio to the stream doesn't work until Firefox 49+. This is why currently [the tests](https://travis-ci.org/aullman/opentok-camera-filters.svg?branch=master) only run in Firefox nightly.
+These filters require the Canvas [captureStream API](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream) which works in Chrome 51+ and Firefox 43+. Adding audio to the stream only started working in Firefox 49+.
 
 # Usage
 
@@ -112,4 +112,4 @@ filter.change((videoElement, canvas) => {
 });
 ```
 
-You can also use the [filterTask](src/filterTask.js) which handles transforming image data from the videoElement and just lets you pass it a filter function which takes ImageData and transforms it returning new ImageData. The [invert function](https://github.com/aullman/opentok-camera-filters/blob/a845d2f4eec8a8a6bea86c3a785ef089656d861f/src/filters.js#L92) is a good example of a simple filter which uses this. 
+You can also use the [filterTask](src/filterTask.js) which handles transforming image data from the videoElement and just lets you pass it a filter function which takes ImageData and transforms it returning new ImageData. The [invert function](https://github.com/aullman/opentok-camera-filters/blob/a845d2f4eec8a8a6bea86c3a785ef089656d861f/src/filters.js#L92) is a good example of a simple filter which uses this.
