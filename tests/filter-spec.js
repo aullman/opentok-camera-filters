@@ -34,7 +34,9 @@ describe('filter', () => {
             done();
           }, 100);
         });
-        publisher.destroy();
+        setTimeout(() => {
+          publisher.destroy();
+        }, 1000);
       });
       filter.setPublisher(publisher);
     });
