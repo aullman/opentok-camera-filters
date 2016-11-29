@@ -42,8 +42,6 @@ If you want to change the filter you can use the change method, eg.
 filter.change(filters.red);
 ```
 
-If you're using the face filter you will need to setup the web worker. The worker expects a file at `'./js/faceWorker.bundle.js'`. The root of that JS file is [src/faceWorker.js](/src/faceWorker.js). So you need to point WebPack or Browserify at that file and put the output in the /js directory of your webserver.
-
 # Available Filters
 
 A lot of the filters were taken from [tracking.js](https://trackingjs.com).
@@ -84,7 +82,7 @@ Inverts the colour in every pixel of the video.
 ![invert](https://github.com/aullman/opentok-camera-filters/raw/master/images/invert.png)
 
 ## face
-Does face detection using [tracking.js](https://trackingjs.com) and draws an image on top of the face.
+Does face detection using [clmtrackr](https://github.com/auduno/clmtrackr) and draws an image on top of the face.
 
 ![face](https://github.com/aullman/opentok-camera-filters/raw/master/images/face.png)
 

@@ -1,6 +1,9 @@
 const tracking = window.tracking = {};
 require('tracking/build/tracking');
 const filterTask = require('./filterTask');
+const clm = require('clmtrackr/clmtrackr.js');
+const Tracker = clm.tracker;
+const pModel = require('clmtrackr/models/model_pca_20_svm.js');
 
 function colourShift(r, g, b, a, imgData) {
   const res = new Uint8ClampedArray(imgData.data.length);
@@ -64,60 +67,54 @@ module.exports = {
     };
     return filterTask(videoElement, canvas, filter);
   },
-  face: function face(videoElement, canvas, imageSrc) {
-    // Draw on the canvas with no filter every requestAnimationFrame
-    let tmpCanvas;
-    let tmpCtx;
+  face: function face2(videoElement, canvas, imageSrc) {
+    let ctx;
     let image;
-    let currentFaces = [];
-    let currentMessage;
-    let worker;
+    let stopped = false;
 
-    const createMessage = function createMessage(dataArray) {
-      return {
-        array: dataArray,
-        width: canvas.width,
-        height: canvas.height,
-      };
-    };
+    const ctracker = new Tracker();
+    ctracker.init(pModel);
+    ctracker.start(videoElement);
 
-    const filter = imgData => {
-      currentMessage = createMessage(imgData.data);
-      if (!worker) {
-        // We create a worker to detect the faces. We can't send the data
-        // for every frame so we just send the most recent frame every time the
-        // worker returns
-        worker = new Worker('./js/faceWorker.bundle.js');
-        worker.addEventListener('message', event => {
-          if (event.data.length) {
-            currentFaces = event.data;
-          } else {
-            currentFaces = [];
-          }
-          if (currentMessage) {
-            worker.postMessage(currentMessage);
-          }
-        });
-
-        worker.postMessage(currentMessage);
+    // Draws a frame on the specified canvas after applying the selected filter every
+    // requestAnimationFrame
+    const drawFrame = function drawFrame() {
+      if (!ctx) {
+        ctx = canvas.getContext('2d');
       }
-
-      if (!tmpCanvas) {
-        tmpCanvas = document.createElement('canvas');
-        tmpCtx = tmpCanvas.getContext('2d');
-        tmpCanvas.width = canvas.width;
-        tmpCanvas.height = canvas.height;
+      if (!videoElement.width) {
+        // This is a fix for clmtrackr, otherwise it complains about 0 width & height
+        videoElement.width = canvas.width; // eslint-disable-line no-param-reassign
+        videoElement.height = canvas.height; // eslint-disable-line no-param-reassign
+      }
+      if (!image) {
         image = document.createElement('img');
         image.src = imageSrc ||
           'https://aullman.github.io/opentok-camera-filters/images/comedy-glasses.png';
       }
-      tmpCtx.putImageData(imgData, 0, 0);
-
-      currentFaces.forEach(rect => {
-        tmpCtx.drawImage(image, rect.x, rect.y, rect.width, rect.height);
-      });
-      return tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
+      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      const positions = ctracker.getCurrentPosition();
+      if (positions && positions.length > 20) {
+        const width = (positions[13][0] - positions[1][0]) * 1.1;
+        const height = (positions[53][1] - positions[20][1]) * 1.15;
+        const y = positions[20][1] - (0.2 * height);
+        const x = positions[0][0];
+        ctx.drawImage(image, x, y, width, height);
+      }
+      if (!stopped) {
+        requestAnimationFrame(drawFrame);
+      } else {
+        ctx = null;
+        image = null;
+      }
     };
-    return filterTask(videoElement, canvas, filter);
+
+    requestAnimationFrame(drawFrame);
+
+    return {
+      stop: () => {
+        stopped = true;
+      },
+    };
   },
 };
