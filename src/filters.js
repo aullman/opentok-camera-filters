@@ -4,6 +4,7 @@ const filterTask = require('./filterTask');
 const clm = require('clmtrackr/clmtrackr.js');
 const Tracker = clm.tracker;
 const pModel = require('clmtrackr/models/model_pca_20_svm.js');
+let ctracker;
 
 function colourShift(r, g, b, a, imgData) {
   const res = new Uint8ClampedArray(imgData.data.length);
@@ -19,6 +20,49 @@ function colourShift(r, g, b, a, imgData) {
 
 function colourFilter(r, g, b, a, videoElement, canvas) {
   return filterTask(videoElement, canvas, colourShift.bind(this, r, g, b, a));
+}
+
+function face(videoElement, canvas, faceFilter) {
+  let ctx;
+  let stopped = false;
+
+  if (!ctracker) {
+    ctracker = new Tracker();
+    ctracker.init(pModel);
+    ctracker.start(videoElement);
+  }
+
+  // Draws a frame on the specified canvas after applying the selected filter every
+  // requestAnimationFrame
+  const drawFrame = function drawFrame() {
+    if (!ctx) {
+      ctx = canvas.getContext('2d');
+    }
+    if (!videoElement.width) {
+      // This is a fix for clmtrackr, otherwise it complains about 0 width & height
+      videoElement.width = canvas.width; // eslint-disable-line no-param-reassign
+      videoElement.height = canvas.height; // eslint-disable-line no-param-reassign
+    }
+    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    if (faceFilter) {
+      faceFilter(ctracker.getCurrentPosition());
+    } else {
+      ctracker.draw(canvas);
+    }
+    if (!stopped) {
+      requestAnimationFrame(drawFrame);
+    } else {
+      ctx = null;
+    }
+  };
+
+  requestAnimationFrame(drawFrame);
+
+  return {
+    stop: () => {
+      stopped = true;
+    },
+  };
 }
 
 // Filters take a source videoElement and a canvas. The video element contains the users
@@ -67,54 +111,40 @@ module.exports = {
     };
     return filterTask(videoElement, canvas, filter);
   },
-  face: function face2(videoElement, canvas, imageSrc) {
-    let ctx;
+  face,
+  glasses: (videoElement, canvas) => {
     let image;
-    let stopped = false;
-
-    const ctracker = new Tracker();
-    ctracker.init(pModel);
-    ctracker.start(videoElement);
-
-    // Draws a frame on the specified canvas after applying the selected filter every
-    // requestAnimationFrame
-    const drawFrame = function drawFrame() {
+    let ctx;
+    return face(videoElement, canvas, positions => {
       if (!ctx) {
         ctx = canvas.getContext('2d');
       }
-      if (!videoElement.width) {
-        // This is a fix for clmtrackr, otherwise it complains about 0 width & height
-        videoElement.width = canvas.width; // eslint-disable-line no-param-reassign
-        videoElement.height = canvas.height; // eslint-disable-line no-param-reassign
-      }
       if (!image) {
         image = document.createElement('img');
-        image.src = imageSrc ||
-          'https://aullman.github.io/opentok-camera-filters/images/comedy-glasses.png';
+        image.src = 'http://localhost:8080/images/comedy-glasses.png';
       }
-      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-      const positions = ctracker.getCurrentPosition();
       if (positions && positions.length > 20) {
-        const width = (positions[13][0] - positions[1][0]) * 1.1;
+        const width = (positions[15][0] - positions[19][0]) * 1.1;
         const height = (positions[53][1] - positions[20][1]) * 1.15;
         const y = positions[20][1] - (0.2 * height);
-        const x = positions[0][0];
-        ctx.drawImage(image, x, y, width, height);
+        const x = positions[19][0];
+        // Calculate the angle to draw by looking at the position of the eyes
+        // The opposite side is the difference in y
+        const opposite = positions[32][1] - positions[27][1];
+        // The adjacent side is the difference in x
+        const adjacent = positions[32][0] - positions[27][0];
+        // tan = opposite / adjacent
+        const angle = Math.atan(opposite / adjacent);
+        try {
+          ctx.translate(x, y);
+          ctx.rotate(angle);
+          ctx.drawImage(image, 0, 0, width, height);
+          ctx.rotate(-angle);
+          ctx.translate(-x, -y);
+        } catch (err) {
+          console.error(err); // eslint-disable-line
+        }
       }
-      if (!stopped) {
-        requestAnimationFrame(drawFrame);
-      } else {
-        ctx = null;
-        image = null;
-      }
-    };
-
-    requestAnimationFrame(drawFrame);
-
-    return {
-      stop: () => {
-        stopped = true;
-      },
-    };
+    });
   },
 };

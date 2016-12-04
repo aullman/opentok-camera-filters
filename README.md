@@ -111,3 +111,15 @@ filter.change((videoElement, canvas) => {
 ```
 
 You can also use the [filterTask](src/filterTask.js) which handles transforming image data from the videoElement and just lets you pass it a filter function which takes ImageData and transforms it returning new ImageData. The [invert function](https://github.com/aullman/opentok-camera-filters/blob/a845d2f4eec8a8a6bea86c3a785ef089656d861f/src/filters.js#L92) is a good example of a simple filter which uses this.
+
+If you want access to the face tracking data from [clmtrackr](https://github.com/auduno/clmtrackr) you can use the `face()` filter and pass in your own renderer function like so:
+
+```javascript
+filter.change((videoElement, canvas) => {
+  return filters.face(videoElement, canvas, positions => {
+    // Do something with the positions and draw something on the canvas
+  });
+});
+```
+
+The positions are the response from `clmtrackr.getCurrentPosition()`. The [glasses filter](https://github.com/aullman/opentok-camera-filters/blob/master/src/filters.js#L115) is an example of a face filter.
