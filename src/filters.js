@@ -121,7 +121,7 @@ module.exports = {
       }
       if (!image) {
         image = document.createElement('img');
-        image.src = 'http://localhost:8080/images/comedy-glasses.png';
+        image.src = 'https://aullman.github.io/opentok-camera-filters/images/comedy-glasses.png';
       }
       if (positions && positions.length > 20) {
         const width = (positions[15][0] - positions[19][0]) * 1.1;
