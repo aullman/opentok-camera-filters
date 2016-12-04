@@ -1,6 +1,10 @@
 const tracking = window.tracking = {};
 require('tracking/build/tracking');
 const filterTask = require('./filterTask');
+const clm = require('clmtrackr/clmtrackr.js');
+const Tracker = clm.tracker;
+const pModel = require('clmtrackr/models/model_pca_20_svm.js');
+let ctracker;
 
 function colourShift(r, g, b, a, imgData) {
   const res = new Uint8ClampedArray(imgData.data.length);
@@ -16,6 +20,49 @@ function colourShift(r, g, b, a, imgData) {
 
 function colourFilter(r, g, b, a, videoElement, canvas) {
   return filterTask(videoElement, canvas, colourShift.bind(this, r, g, b, a));
+}
+
+function face(videoElement, canvas, faceFilter) {
+  let ctx;
+  let stopped = false;
+
+  if (!ctracker) {
+    ctracker = new Tracker();
+    ctracker.init(pModel);
+    ctracker.start(videoElement);
+  }
+
+  // Draws a frame on the specified canvas after applying the selected filter every
+  // requestAnimationFrame
+  const drawFrame = function drawFrame() {
+    if (!ctx) {
+      ctx = canvas.getContext('2d');
+    }
+    if (!videoElement.width) {
+      // This is a fix for clmtrackr, otherwise it complains about 0 width & height
+      videoElement.width = canvas.width; // eslint-disable-line no-param-reassign
+      videoElement.height = canvas.height; // eslint-disable-line no-param-reassign
+    }
+    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    if (faceFilter) {
+      faceFilter(ctracker.getCurrentPosition());
+    } else {
+      ctracker.draw(canvas);
+    }
+    if (!stopped) {
+      requestAnimationFrame(drawFrame);
+    } else {
+      ctx = null;
+    }
+  };
+
+  requestAnimationFrame(drawFrame);
+
+  return {
+    stop: () => {
+      stopped = true;
+    },
+  };
 }
 
 // Filters take a source videoElement and a canvas. The video element contains the users
@@ -64,60 +111,40 @@ module.exports = {
     };
     return filterTask(videoElement, canvas, filter);
   },
-  face: function face(videoElement, canvas, imageSrc) {
-    // Draw on the canvas with no filter every requestAnimationFrame
-    let tmpCanvas;
-    let tmpCtx;
+  face,
+  glasses: (videoElement, canvas) => {
     let image;
-    let currentFaces = [];
-    let currentMessage;
-    let worker;
-
-    const createMessage = function createMessage(dataArray) {
-      return {
-        array: dataArray,
-        width: canvas.width,
-        height: canvas.height,
-      };
-    };
-
-    const filter = imgData => {
-      currentMessage = createMessage(imgData.data);
-      if (!worker) {
-        // We create a worker to detect the faces. We can't send the data
-        // for every frame so we just send the most recent frame every time the
-        // worker returns
-        worker = new Worker('./js/faceWorker.bundle.js');
-        worker.addEventListener('message', event => {
-          if (event.data.length) {
-            currentFaces = event.data;
-          } else {
-            currentFaces = [];
-          }
-          if (currentMessage) {
-            worker.postMessage(currentMessage);
-          }
-        });
-
-        worker.postMessage(currentMessage);
+    let ctx;
+    return face(videoElement, canvas, positions => {
+      if (!ctx) {
+        ctx = canvas.getContext('2d');
       }
-
-      if (!tmpCanvas) {
-        tmpCanvas = document.createElement('canvas');
-        tmpCtx = tmpCanvas.getContext('2d');
-        tmpCanvas.width = canvas.width;
-        tmpCanvas.height = canvas.height;
+      if (!image) {
         image = document.createElement('img');
-        image.src = imageSrc ||
-          'https://aullman.github.io/opentok-camera-filters/images/comedy-glasses.png';
+        image.src = 'https://aullman.github.io/opentok-camera-filters/images/comedy-glasses.png';
       }
-      tmpCtx.putImageData(imgData, 0, 0);
-
-      currentFaces.forEach(rect => {
-        tmpCtx.drawImage(image, rect.x, rect.y, rect.width, rect.height);
-      });
-      return tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
-    };
-    return filterTask(videoElement, canvas, filter);
+      if (positions && positions.length > 20) {
+        const width = (positions[15][0] - positions[19][0]) * 1.1;
+        const height = (positions[53][1] - positions[20][1]) * 1.15;
+        const y = positions[20][1] - (0.2 * height);
+        const x = positions[19][0];
+        // Calculate the angle to draw by looking at the position of the eyes
+        // The opposite side is the difference in y
+        const opposite = positions[32][1] - positions[27][1];
+        // The adjacent side is the difference in x
+        const adjacent = positions[32][0] - positions[27][0];
+        // tan = opposite / adjacent
+        const angle = Math.atan(opposite / adjacent);
+        try {
+          ctx.translate(x, y);
+          ctx.rotate(angle);
+          ctx.drawImage(image, 0, 0, width, height);
+          ctx.rotate(-angle);
+          ctx.translate(-x, -y);
+        } catch (err) {
+          console.error(err); // eslint-disable-line
+        }
+      }
+    });
   },
 };

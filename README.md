@@ -42,8 +42,6 @@ If you want to change the filter you can use the change method, eg.
 filter.change(filters.red);
 ```
 
-If you're using the face filter you will need to setup the web worker. The worker expects a file at `'./js/faceWorker.bundle.js'`. The root of that JS file is [src/faceWorker.js](/src/faceWorker.js). So you need to point WebPack or Browserify at that file and put the output in the /js directory of your webserver.
-
 # Available Filters
 
 A lot of the filters were taken from [tracking.js](https://trackingjs.com).
@@ -84,7 +82,7 @@ Inverts the colour in every pixel of the video.
 ![invert](https://github.com/aullman/opentok-camera-filters/raw/master/images/invert.png)
 
 ## face
-Does face detection using [tracking.js](https://trackingjs.com) and draws an image on top of the face.
+Does face detection using [clmtrackr](https://github.com/auduno/clmtrackr) and draws an image on top of the face.
 
 ![face](https://github.com/aullman/opentok-camera-filters/raw/master/images/face.png)
 
@@ -113,3 +111,15 @@ filter.change((videoElement, canvas) => {
 ```
 
 You can also use the [filterTask](src/filterTask.js) which handles transforming image data from the videoElement and just lets you pass it a filter function which takes ImageData and transforms it returning new ImageData. The [invert function](https://github.com/aullman/opentok-camera-filters/blob/a845d2f4eec8a8a6bea86c3a785ef089656d861f/src/filters.js#L92) is a good example of a simple filter which uses this.
+
+If you want access to the face tracking data from [clmtrackr](https://github.com/auduno/clmtrackr) you can use the `face()` filter and pass in your own renderer function like so:
+
+```javascript
+filter.change((videoElement, canvas) => {
+  return filters.face(videoElement, canvas, positions => {
+    // Do something with the positions and draw something on the canvas
+  });
+});
+```
+
+The positions are the response from `clmtrackr.getCurrentPosition()`. The [glasses filter](https://github.com/aullman/opentok-camera-filters/blob/master/src/filters.js#L115) is an example of a face filter.
