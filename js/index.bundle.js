@@ -67,14 +67,14 @@
 	// Wait for OT to load before we start using it
 	window.addEventListener('load', () => {
 	  // Simple Hello World App
-	  const session = OT.initSession(("1127"), ("1_MX4xMTI3fn4xNDcwNjIxNzg2MDkyfnF0UlUyUzUzbDZIVy9TR082REc2amVIMX5-"));
+	  const session = OT.initSession(("44935341"), ("1_MX40NDkzNTM0MX5-MTQ2ODgwODY2NjQxOH56NWdGQk9OSi9wKyt5YVpqbDJUTnZOV2Z-fg"));
 	  session.on('streamCreated', event => {
 	    session.subscribe(event.stream, err => {
 	      if (err) alert(err.message);
 	    });
 	  });
 	
-	  session.connect(("T1==cGFydG5lcl9pZD0xMTI3JnNpZz01NTc3MWUxODdlOWFkNzA3ODVmNTRmOTQxNDBkMzczYWM5YzZlZGNlOnNlc3Npb25faWQ9MV9NWDR4TVRJM2ZuNHhORGN3TmpJeE56ZzJNRGt5Zm5GMFVsVXlVelV6YkRaSVZ5OVRSMDgyUkVjMmFtVklNWDUtJmNyZWF0ZV90aW1lPTE0ODEwMjY2NDUmbm9uY2U9MC45MjI4MzI5NjI3ODcyNDI1JnJvbGU9cHVibGlzaGVyJmV4cGlyZV90aW1lPTE0ODExOTk0NDU="), err => {
+	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9ZWE3NGYxOWY3ZTNhYzk5ZjI3ZjQxOGU4M2FhZDFkYTc3YmEzODE2NzpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDgxMDI3MTc4Jm5vbmNlPTAuNDcxMzY4NDA4NTI5MDg3OSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDgxMTk5OTc4"), err => {
 	    if (err) alert(err.message);
 	    const publisher = session.publish(null, {
 	      resolution: '320x240',
