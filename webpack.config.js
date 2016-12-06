@@ -5,7 +5,6 @@ const opentok = new OpenTok(process.env.OT_API_KEY, process.env.OT_API_SECRET);
 module.exports = {
   entry: {
     index: './src/index.js',
-    faceWorker: 'opentok-camera-filters/src/faceWorker.js',
   },
   output: {
     path: './js/',
