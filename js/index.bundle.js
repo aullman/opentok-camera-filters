@@ -74,7 +74,7 @@
 	    });
 	  });
 	
-	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9NjJiYmYyMWFiYWNkOTYxMjk4MTVlYWIxOGU5YWVlMDE1YmI5MTI2NTpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDgxMjU1NTc5Jm5vbmNlPTAuNzAwNDAyNjA2OTc3MTQ5OCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDgxNDI4Mzc5"), err => {
+	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9YWRmMTc3OGQ3MGVlZmZkYjc5MzcwZWZkMWQyNjBhMDRhZWUxZjhhYTpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDgxNTEzODQ5Jm5vbmNlPTAuNTE3NzE1MzUwNzI0NzU2NyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDgxNjg2NjQ5"), err => {
 	    if (err) alert(err.message);
 	    const publisher = session.publish(null, {
 	      resolution: '320x240',
@@ -110,6 +110,11 @@
 	
 	function colourFilter(r, g, b, a, videoElement, canvas) {
 	  return filterTask(videoElement, canvas, colourShift.bind(this, r, g, b, a));
+	}
+	
+	// Calculate the distance between 2 points
+	function distance(point1, point2) {
+	  return Math.sqrt(Math.pow(point2[0] - point1[0], 2) + Math.pow(point2[1] - point1[1], 2));
 	}
 	
 	function face(videoElement, canvas, faceFilter) {
@@ -214,8 +219,8 @@
 	        image.src = 'https://aullman.github.io/opentok-camera-filters/images/comedy-glasses.png';
 	      }
 	      if (positions && positions.length > 20) {
-	        const width = (positions[15][0] - positions[19][0]) * 1.1;
-	        const height = (positions[53][1] - positions[20][1]) * 1.15;
+	        const width = distance(positions[15], positions[19]) * 1.1;
+	        const height = distance(positions[53], positions[20]) * 1.15;
 	        const y = positions[20][1] - (0.2 * height);
 	        const x = positions[19][0];
 	        // Calculate the angle to draw by looking at the position of the eyes
