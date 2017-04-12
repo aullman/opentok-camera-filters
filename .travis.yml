@@ -7,9 +7,8 @@ node_js:
 env:
   matrix:
     - BROWSER=chrome  BVER=stable
-    - BROWSER=firefox BVER=stable
+    - BROWSER=firefox BVER=51.0.1
     - BROWSER=chrome  BVER=beta
-    - BROWSER=firefox BVER=beta
     - BROWSER=chrome  BVER=unstable
     - BROWSER=firefox BVER=unstable
 
@@ -25,7 +24,7 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
-    - env: BROWSER=firefox BVER=51.0.1
+    - env: BROWSER=firefox BVER=unstable
     - env: BROWSER=chrome  BVER=unstable
 
 
