@@ -25,7 +25,7 @@
     "karma-jasmine": "^1.0.2",
     "karma-webpack": "^1.7.0",
     "opentok": "^2.3.2",
-    "opentok-test-scripts": "^3.0.3",
+    "opentok-test-scripts": "^3.3.1",
     "travis-multirunner": "^3.0.1",
     "webpack": "^1.13.1"
   },
