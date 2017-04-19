@@ -42,7 +42,7 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* global OT config */
 	// A real app would use require('opentok-filters/src/filters.js');
@@ -74,7 +74,7 @@
 	    });
 	  });
 	
-	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9YjZmNzFkY2QzOWJkNzQ0OTYzNDc3NjNhOTRhY2NhNTQ0NDA4YTQzNjpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDkxOTU5MzkzJm5vbmNlPTAuMjg2MzkyNzQ1MDk2MjM2NDcmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ5MjEzMjE5Mw=="), err => {
+	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9Mjc1N2I4ZjM5NDllYTBiZDJmNzZkNWFjZWY4YzQ3ZmNhZTVkZDUwMTpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDkyNTY0MDM4Jm5vbmNlPTAuOTE0OTgxMTY0NTAzODQyNiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDkyNzM2ODM4"), err => {
 	    if (err) alert(err.message);
 	    const publisher = session.publish(null, {
 	      resolution: '320x240',
@@ -84,9 +84,9 @@
 	});
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	const tracking = window.tracking = {};
 	__webpack_require__(2);
@@ -245,9 +245,9 @@
 	};
 
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * tracking - A modern approach for Computer Vision on the web.
@@ -2696,9 +2696,9 @@
 	}());
 
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function filterTask(videoElement, canvas, selectedFilter) {
 	  let tmpCanvas;
@@ -2741,9 +2741,9 @@
 	};
 
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * clmtrackr library (https://www.github.com/auduno/clmtrackr/)
@@ -11341,9 +11341,9 @@
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	var pModel = {
 	  "scoring": {
@@ -11972,9 +11972,9 @@
 	module.exports = pModel;
 
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	const mockGetUserMedia = __webpack_require__(7);
 	
@@ -12040,9 +12040,9 @@
 	};
 
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	
 	// Takes a mockOnStreamAvailable function which when given a webrtcstream returns a new stream
@@ -12066,6 +12066,6 @@
 	};
 
 
-/***/ }
+/***/ })
 /******/ ]);
 //# sourceMappingURL=index.bundle.js.map
