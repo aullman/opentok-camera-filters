@@ -1,4 +1,4 @@
-/* global describe it expect OT beforeEach SESSION_ID TOKEN API_KEY jasmine spyOn */
+/* global describe it expect OT beforeAll SESSION_ID TOKEN API_KEY jasmine spyOn */
 const filters = require('../src/filters.js');
 const filter = require('../src/filter.js')(filters.none);
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -13,7 +13,7 @@ describe('filter', () => {
   });
 
   describe('OpenTok Publisher', () => {
-    beforeEach(done => {
+    beforeAll(done => {
       const script = document.createElement('script');
       script.src = 'https://tbdev.tokbox.com/v2/js/opentok.js';
       script.type = 'text/javascript';
