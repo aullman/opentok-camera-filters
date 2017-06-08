@@ -74,7 +74,7 @@
 	    });
 	  });
 	
-	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9NDM5NjRjNjFlMzA0ODJhYmZlY2E1OTVjNzBkODAzMDAxYTNiNDhkMjpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDk2OTAxMzI4Jm5vbmNlPTAuMjA0MDQyNTAxNzQ3NjA4MTgmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ5NzA3NDEyOA=="), err => {
+	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9ZmU5YmYwM2UwZWQ4ODU4MzdjOTdkMGU1YjA4ZjQ4ZGIyZWM4MzUzZDpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDk2OTA0NzU4Jm5vbmNlPTAuNjk0OTYyNjE1NjEyODk0MyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDk3MDc3NTU4"), err => {
 	    if (err) alert(err.message);
 	    const publisher = session.publish(null, {
 	      resolution: '320x240',
@@ -12044,7 +12044,6 @@
 /* 7 */
 /***/ (function(module, exports) {
 
-	
 	// Takes a mockOnStreamAvailable function which when given a webrtcstream returns a new stream
 	// to replace it with.
 	module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
@@ -12054,12 +12053,25 @@
 	      navigator.mozGetUserMedia;
 	    navigator.webkitGetUserMedia = navigator.getUserMedia = navigator.mozGetUserMedia =
 	      function getUserMedia(constraints, onStreamAvailable, onStreamAvailableError,
-	        onAccessDialogOpened, onAccessDialogClosed, onAccessDenied) {
+	                            onAccessDialogOpened, onAccessDialogClosed, onAccessDenied) {
 	        return oldGetUserMedia.call(navigator, constraints, stream => {
 	          onStreamAvailable(mockOnStreamAvailable(stream));
 	        }, onStreamAvailableError,
 	        onAccessDialogOpened, onAccessDialogClosed, onAccessDenied);
 	      };
+	  } else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+	    oldGetUserMedia = navigator.mediaDevices.getUserMedia;
+	    navigator.mediaDevices.getUserMedia = function getUserMedia (constraints) {
+	      return new Promise(function (resolve, reject) {
+	        oldGetUserMedia.call(navigator.mediaDevices, constraints).then(stream => {
+	          resolve(mockOnStreamAvailable(stream));
+	        }, reason => {
+	          reject(reason);
+	        }).catch(err => {
+	          console.error('Error getting mock stream', err);
+	        });
+	      });
+	    };
 	  } else {
 	    console.warn('Could not find getUserMedia function to mock out');
 	  }
