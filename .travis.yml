@@ -11,7 +11,7 @@ node_js:
 env:
   matrix:
     - BROWSER=chrome  BVER=stable
-    - BROWSER=firefox BVER=51.0.1
+    - BROWSER=firefox BVER=stable
     - BROWSER=chrome  BVER=beta
     - BROWSER=chrome  BVER=unstable
     - BROWSER=firefox BVER=unstable
