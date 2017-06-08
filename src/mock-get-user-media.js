@@ -1,4 +1,3 @@
-
 // Takes a mockOnStreamAvailable function which when given a webrtcstream returns a new stream
 // to replace it with.
 module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
@@ -8,12 +7,25 @@ module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
       navigator.mozGetUserMedia;
     navigator.webkitGetUserMedia = navigator.getUserMedia = navigator.mozGetUserMedia =
       function getUserMedia(constraints, onStreamAvailable, onStreamAvailableError,
-        onAccessDialogOpened, onAccessDialogClosed, onAccessDenied) {
+                            onAccessDialogOpened, onAccessDialogClosed, onAccessDenied) {
         return oldGetUserMedia.call(navigator, constraints, stream => {
           onStreamAvailable(mockOnStreamAvailable(stream));
         }, onStreamAvailableError,
         onAccessDialogOpened, onAccessDialogClosed, onAccessDenied);
       };
+  } else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    oldGetUserMedia = navigator.mediaDevices.getUserMedia;
+    navigator.mediaDevices.getUserMedia = function getUserMedia (constraints) {
+      return new Promise(function (resolve, reject) {
+        oldGetUserMedia.call(navigator.mediaDevices, constraints).then(stream => {
+          resolve(mockOnStreamAvailable(stream));
+        }, reason => {
+          reject(reason);
+        }).catch(err => {
+          console.error('Error getting mock stream', err);
+        });
+      });
+    };
   } else {
     console.warn('Could not find getUserMedia function to mock out');
   }
