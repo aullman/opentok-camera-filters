@@ -13,10 +13,11 @@ module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
         }, onStreamAvailableError,
         onAccessDialogOpened, onAccessDialogClosed, onAccessDenied);
       };
-  } else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  }
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     oldGetUserMedia = navigator.mediaDevices.getUserMedia;
-    navigator.mediaDevices.getUserMedia = function getUserMedia (constraints) {
-      return new Promise(function (resolve, reject) {
+    navigator.mediaDevices.getUserMedia = function getUserMedia(constraints) {
+      return new Promise((resolve, reject) => {
         oldGetUserMedia.call(navigator.mediaDevices, constraints).then(stream => {
           resolve(mockOnStreamAvailable(stream));
         }, reason => {
