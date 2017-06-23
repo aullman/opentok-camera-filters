@@ -20,11 +20,7 @@ module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
       return new Promise((resolve, reject) => {
         oldGetUserMedia.call(navigator.mediaDevices, constraints).then(stream => {
           resolve(mockOnStreamAvailable(stream));
-        }, reason => {
-          reject(reason);
-        }).catch(err => {
-          console.error('Error getting mock stream', err);
-        });
+        }).catch(reject);
       });
     };
   } else {

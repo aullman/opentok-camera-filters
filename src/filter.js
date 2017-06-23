@@ -11,7 +11,7 @@ let initialFilter;
 mockGetUserMedia(stream => {
   videoElement = document.createElement('video');
   videoElement.muted = 'true';
-  videoElement.src = URL.createObjectURL(stream);
+  videoElement.srcObject = stream;
 
   videoElement.addEventListener('loadedmetadata', () => {
     videoElement.play();
