@@ -74,7 +74,7 @@
 	    });
 	  });
 	
-	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9ZDhmMjIzOTg2ZTY0ZWZkMDU2YjVjMjA3NGZjMTg1MDg3MGI2YWM4NzpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDk4MjIxODUxJm5vbmNlPTAuNjM2ODU2OTkyMDMwNTE2MyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDk5MDg1ODUx"), err => {
+	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9NDZmZjA1M2ZiZDM4NmY2Yjc1NmU5MWY2YTM5ZDQ4MDQ5ZWNkOTExZDpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNDk4MjI0MjIzJm5vbmNlPTAuMTI2NDYzNTY4MzAzNzM0MDYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ5OTA4ODIyMw=="), err => {
 	    if (err) alert(err.message);
 	    const publisher = session.publish(null, {
 	      resolution: '320x240',
@@ -11989,7 +11989,7 @@
 	mockGetUserMedia(stream => {
 	  videoElement = document.createElement('video');
 	  videoElement.muted = 'true';
-	  videoElement.src = URL.createObjectURL(stream);
+	  videoElement.srcObject = stream;
 	
 	  videoElement.addEventListener('loadedmetadata', () => {
 	    videoElement.play();
@@ -12066,11 +12066,7 @@
 	      return new Promise((resolve, reject) => {
 	        oldGetUserMedia.call(navigator.mediaDevices, constraints).then(stream => {
 	          resolve(mockOnStreamAvailable(stream));
-	        }, reason => {
-	          reject(reason);
-	        }).catch(err => {
-	          console.error('Error getting mock stream', err);
-	        });
+	        }).catch(reject);
 	      });
 	    };
 	  } else {
