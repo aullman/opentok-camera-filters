@@ -30,7 +30,7 @@
     "webpack": "^1.13.1"
   },
   "dependencies": {
-    "clmtrackr": "^1.0.1",
+    "clmtrackr": "~1.0.1",
     "tracking": "^1.1.2"
   }
 }
