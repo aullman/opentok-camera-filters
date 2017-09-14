@@ -74,7 +74,7 @@
 	    });
 	  });
 	
-	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9ZTg3MjU3ZTk2OTE0YzM4ZjJjODA0NmNkOGVkYzhiMzBhNzg2OTdhZjpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTA1MjY1MzY5Jm5vbmNlPTAuNzQ0MjE5MDQ5ODExMzYzMiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTA2MTI5MzY5JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9"), err => {
+	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9OTAzYmU2MDE5ZmU3ZDU3MTVmMTVjMjVhYWVmYzgyNmY0ZWU2OGI0ZTpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTA1MzczNTc0Jm5vbmNlPTAuMDY3ODE0NjI5NTI0OTQ2MjEmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTUwNjIzNzU3NCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=="), err => {
 	    if (err) alert(err.message);
 	    const publisher = session.publish(null, {
 	      resolution: '320x240',
@@ -12047,29 +12047,29 @@
 	// Takes a mockOnStreamAvailable function which when given a webrtcstream returns a new stream
 	// to replace it with.
 	module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
-	  let oldGetUserMedia;
-	  if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
-	    oldGetUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-	      navigator.mozGetUserMedia;
-	    navigator.webkitGetUserMedia = navigator.getUserMedia = navigator.mozGetUserMedia =
-	      function getUserMedia(constraints, onStreamAvailable, onStreamAvailableError,
-	                            onAccessDialogOpened, onAccessDialogClosed, onAccessDenied) {
-	        return oldGetUserMedia.call(navigator, constraints, stream => {
-	          onStreamAvailable(mockOnStreamAvailable(stream));
-	        }, onStreamAvailableError,
-	        onAccessDialogOpened, onAccessDialogClosed, onAccessDenied);
-	      };
-	  }
+	  let didMock = false;
+	
+	  ['getUserMedia', 'webkitGetUserMedia', 'mozGetUserMedia'].forEach(gumKey => {
+	    if (navigator[gumKey]) {
+	      didMock = true;
+	      const oldGetUserMedia = navigator[gumKey].bind(navigator);
+	      navigator[gumKey] = (constraints, onStreamAvailable, ...args) => (
+	        oldGetUserMedia(constraints, stream => (
+	          onStreamAvailable(mockOnStreamAvailable(stream))
+	        ), ...args)
+	      );
+	    }
+	  });
+	
 	  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-	    oldGetUserMedia = navigator.mediaDevices.getUserMedia;
-	    navigator.mediaDevices.getUserMedia = function getUserMedia(constraints) {
-	      return new Promise((resolve, reject) => {
-	        oldGetUserMedia.call(navigator.mediaDevices, constraints).then(stream => {
-	          resolve(mockOnStreamAvailable(stream));
-	        }).catch(reject);
-	      });
-	    };
-	  } else {
+	    didMock = true;
+	    const oldGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+	    navigator.mediaDevices.getUserMedia = constraints => (
+	      oldGetUserMedia(constraints).then(mockOnStreamAvailable)
+	    );
+	  }
+	
+	  if (!didMock) {
 	    console.warn('Could not find getUserMedia function to mock out');
 	  }
 	};
