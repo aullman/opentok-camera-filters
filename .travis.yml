@@ -8,8 +8,8 @@ addons:
 node_js:
 - '4'
 
-env:
-  matrix:
+matrix:
+  include:
     - os: linux
       env: BROWSER=chrome  BVER=stable
     - os: linux
@@ -26,6 +26,7 @@ env:
       osx_image: xcode9
       env: BROWSER=safari BVER=unstable
 
+env:
   global:
   - TRAVIS=true
   - UNIT_CMD='npm run unit'
