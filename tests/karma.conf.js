@@ -23,6 +23,7 @@ module.exports = config => {
     plugins: [
       'karma-chrome-launcher',
       'karma-firefox-launcher',
+      'karma-safaritechpreview-launcher',
       'karma-webpack',
       'karma-jasmine',
     ],
@@ -46,6 +47,9 @@ module.exports = config => {
           'media.navigator.permission.disabled': true,
           'media.navigator.streams.fake': true,
         },
+      },
+      safari: {
+        base: 'SafariTechPreview',
       },
     },
 

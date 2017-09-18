@@ -15,6 +15,9 @@ env:
     - BROWSER=chrome  BVER=beta
     - BROWSER=chrome  BVER=unstable
     - BROWSER=firefox BVER=unstable
+    - os: osx
+      osx_image: xcode9
+      env: BROWSER=safari BVER=unstable
 
   global:
   - TRAVIS=true
