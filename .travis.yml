@@ -8,6 +8,16 @@ addons:
 node_js:
 - '4'
 
+env:
+  global:
+  - TRAVIS=true
+  - UNIT_CMD='npm run unit'
+  - INTEGRATION_CMD=''
+  - OT_API_KEY='44935341'
+  - OT_SESSION_ID='1_MX40NDkzNTM0MX5-MTQ2ODgwODY2NjQxOH56NWdGQk9OSi9wKyt5YVpqbDJUTnZOV2Z-fg'
+  - ENCRYPTION_LABEL='32ad1f65cbbe'
+  - COMMIT_AUTHOR_EMAIL='adam@tokbox.com'
+
 matrix:
   include:
     - os: linux
@@ -25,18 +35,6 @@ matrix:
     - os: osx
       osx_image: xcode9
       env: BROWSER=safari BVER=unstable
-
-env:
-  global:
-  - TRAVIS=true
-  - UNIT_CMD='npm run unit'
-  - INTEGRATION_CMD=''
-  - OT_API_KEY='44935341'
-  - OT_SESSION_ID='1_MX40NDkzNTM0MX5-MTQ2ODgwODY2NjQxOH56NWdGQk9OSi9wKyt5YVpqbDJUTnZOV2Z-fg'
-  - ENCRYPTION_LABEL='32ad1f65cbbe'
-  - COMMIT_AUTHOR_EMAIL='adam@tokbox.com'
-
-matrix:
   fast_finish: true
   allow_failures:
     - os: linux
