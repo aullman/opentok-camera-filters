@@ -11,6 +11,7 @@ const globalVars = {
 module.exports = config => {
   config.set({
     frameworks: ['jasmine'],
+    hostname: '127.0.0.1',
 
     files: ['*.js'],
 
