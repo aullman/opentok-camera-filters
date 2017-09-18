@@ -45,8 +45,8 @@ matrix:
 
 before_script:
   - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - pulseaudio --start
+  - if [ -f /etc/init.d/xvfb ]; then sh -e /etc/init.d/xvfb start; fi
+  - if [ $BROWSER == 'firefox' ]; then pulseaudio --start; fi
 
 after_success:
   - ./deploy.sh
