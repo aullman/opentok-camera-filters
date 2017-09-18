@@ -1,5 +1,6 @@
 // Takes a mockOnStreamAvailable function which when given a webrtcstream returns a new stream
 // to replace it with.
+let mockedGetUserMedia;
 module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
   let didMock = false;
 
@@ -18,9 +19,10 @@ module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     didMock = true;
     const oldGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-    navigator.mediaDevices.getUserMedia = constraints => (
+    mockedGetUserMedia = constraints => (
       oldGetUserMedia(constraints).then(mockOnStreamAvailable)
     );
+    navigator.mediaDevices.getUserMedia = mockedGetUserMedia;
   }
 
   if (!didMock) {
