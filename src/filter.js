@@ -26,13 +26,13 @@ mockGetUserMedia(stream => {
     if (initialFilter) {
       selectedFilter = initialFilter(videoElement, canvas);
     }
-    if (stream.getAudioTracks().length) {
-      // Add the audio track to the stream
-      // This actually doesn't work in Firefox until version 49
-      // https://bugzilla.mozilla.org/show_bug.cgi?id=1271669
-      canvasStream.addTrack(stream.getAudioTracks()[0]);
-    }
   });
+  if (stream.getAudioTracks().length) {
+    // Add the audio track to the stream
+    // This actually doesn't work in Firefox until version 49
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1271669
+    canvasStream.addTrack(stream.getAudioTracks()[0]);
+  }
   return canvasStream;
 });
 
