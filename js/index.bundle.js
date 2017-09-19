@@ -74,11 +74,9 @@
 	    });
 	  });
 	
-	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9OTAzYmU2MDE5ZmU3ZDU3MTVmMTVjMjVhYWVmYzgyNmY0ZWU2OGI0ZTpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTA1MzczNTc0Jm5vbmNlPTAuMDY3ODE0NjI5NTI0OTQ2MjEmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTUwNjIzNzU3NCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=="), err => {
+	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9Nzg4NmJlZjBiOTBmN2M4YmZlYThkOTRiMGYzZTI3OGRiZDk4M2VhOTpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTA1Nzk3NzY3Jm5vbmNlPTAuNzk5NTg0NjA0Nzk5NzQ3NSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTA2NjYxNzY3JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9"), err => {
 	    if (err) alert(err.message);
-	    const publisher = session.publish(null, {
-	      resolution: '320x240',
-	    });
+	    const publisher = session.publish(null);
 	    filter.setPublisher(publisher);
 	  });
 	});
@@ -11988,20 +11986,23 @@
 	// Mock out getUserMedia and replace the stream with the canvas.captureStream()
 	mockGetUserMedia(stream => {
 	  videoElement = document.createElement('video');
-	  videoElement.muted = 'true';
 	  videoElement.srcObject = stream;
+	  videoElement.setAttribute('playsinline', '');
+	  videoElement.muted = true;
+	  setTimeout(() => {
+	    videoElement.play();
+	  });
+	  const canvasStream = canvas.captureStream();
 	
 	  videoElement.addEventListener('loadedmetadata', () => {
-	    videoElement.play();
 	    canvas.width = videoElement.videoWidth;
 	    canvas.height = videoElement.videoHeight;
 	    videoElementLoaded = true;
+	
 	    if (initialFilter) {
 	      selectedFilter = initialFilter(videoElement, canvas);
 	    }
 	  });
-	
-	  const canvasStream = canvas.captureStream();
 	  if (stream.getAudioTracks().length) {
 	    // Add the audio track to the stream
 	    // This actually doesn't work in Firefox until version 49
@@ -12022,7 +12023,20 @@
 	      // We insert the canvas into the publisher element. captureStream() only works
 	      // with Canvas elements that are visible and in the DOM.
 	      const pubEl = document.querySelector(`#${publisher.id}`);
-	      pubEl.appendChild(canvas);
+	      const widgetContainer = pubEl.querySelector('.OT_widget-container');
+	      let pubVid = pubEl.querySelector('.OT_widget-container video');
+	      widgetContainer.insertBefore(canvas, pubVid);
+	      canvas.style.width = '100%';
+	      canvas.style.height = '100%';
+	      const setObjectFit = () => {
+	        pubVid = pubEl.querySelector('.OT_widget-container video');
+	        canvas.style.objectFit = window.getComputedStyle(pubVid).objectFit;
+	      };
+	      if (!pubVid) {
+	        publisher.on('videoElementCreated', setObjectFit);
+	      } else {
+	        setObjectFit();
+	      }
 	      publisher.on('destroyed', () => {
 	        // Stop running the filter
 	        if (selectedFilter) {
@@ -12046,6 +12060,7 @@
 
 	// Takes a mockOnStreamAvailable function which when given a webrtcstream returns a new stream
 	// to replace it with.
+	let mockedGetUserMedia;
 	module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
 	  let didMock = false;
 	
@@ -12064,9 +12079,10 @@
 	  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 	    didMock = true;
 	    const oldGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-	    navigator.mediaDevices.getUserMedia = constraints => (
+	    mockedGetUserMedia = constraints => (
 	      oldGetUserMedia(constraints).then(mockOnStreamAvailable)
 	    );
+	    navigator.mediaDevices.getUserMedia = mockedGetUserMedia;
 	  }
 	
 	  if (!didMock) {

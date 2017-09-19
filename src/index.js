@@ -30,9 +30,7 @@ window.addEventListener('load', () => {
 
   session.connect(config.OT_TOKEN, err => {
     if (err) alert(err.message);
-    const publisher = session.publish(null, {
-      resolution: '320x240',
-    });
+    const publisher = session.publish(null);
     filter.setPublisher(publisher);
   });
 });
