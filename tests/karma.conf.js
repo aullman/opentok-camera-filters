@@ -11,7 +11,7 @@ const globalVars = {
 module.exports = config => {
   config.set({
     frameworks: ['jasmine'],
-    hostname: process.env.BROWSER === 'safari' ? '127.0.0.1' : 'localhost',
+    hostname: '127.0.0.1',
 
     files: ['*.js'],
 
