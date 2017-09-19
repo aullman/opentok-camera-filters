@@ -1,6 +1,6 @@
 {
   "name": "opentok-camera-filters",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Streaming from a Canvas with Filters to an OpenTok Session",
   "main": "src/filter.js",
   "scripts": {
@@ -23,10 +23,11 @@
     "karma-chrome-launcher": "^1.0.1",
     "karma-firefox-launcher": "^1.0.0",
     "karma-jasmine": "^1.0.2",
+    "karma-safaritechpreview-launcher": "0.0.6",
     "karma-webpack": "^1.7.0",
     "opentok": "^2.3.2",
-    "opentok-test-scripts": "^3.3.1",
-    "travis-multirunner": "^3.0.1",
+    "opentok-test-scripts": "^3.6.0",
+    "travis-multirunner": "^4.2.0",
     "webpack": "^1.13.1"
   },
   "dependencies": {

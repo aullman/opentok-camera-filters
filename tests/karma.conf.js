@@ -11,6 +11,7 @@ const globalVars = {
 module.exports = config => {
   config.set({
     frameworks: ['jasmine'],
+    hostname: '127.0.0.1',
 
     files: ['*.js'],
 
@@ -23,6 +24,7 @@ module.exports = config => {
     plugins: [
       'karma-chrome-launcher',
       'karma-firefox-launcher',
+      'karma-safaritechpreview-launcher',
       'karma-webpack',
       'karma-jasmine',
     ],
@@ -46,6 +48,9 @@ module.exports = config => {
           'media.navigator.permission.disabled': true,
           'media.navigator.streams.fake': true,
         },
+      },
+      safari: {
+        base: 'SafariTechPreview',
       },
     },
 
