@@ -13,8 +13,9 @@ Library which lets you add visual filters to your OpenTok Publisher.
 
 * Chrome 51+
 * Firefox 49+
+* Safari 11+
 
-These filters require the Canvas [captureStream API](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream) which works in Chrome 51+ and Firefox 43+. Adding audio to the stream only started working in Firefox 49+.
+These filters require the Canvas [captureStream API](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream) which works in Chrome 51+, Firefox 43+ and Safari 11+ (and Safari on iOS 11). Adding audio to the stream only started working in Firefox 49+.
 
 # Usage
 
