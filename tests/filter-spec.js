@@ -21,14 +21,20 @@ describe('filter', () => {
       document.body.appendChild(script);
     });
 
-    it('stops drawing frames when the publisher is destroyed', done => {
+    it('stops drawing frames and stops the stream when the publisher is destroyed', done => {
       spyOn(window, 'requestAnimationFrame').and.callThrough();
       const publisher = OT.initPublisher(err => {
         expect(err).toBeFalsy();
+        const originalStream = filter.originalStream;
+        expect(originalStream).toBeDefined();
         publisher.on('destroyed', () => {
           // Check that filterTask isn't still being called after we destroyed the publisher
           const callCount = window.requestAnimationFrame.calls.count();
           expect(callCount).toBeGreaterThan(0);
+          // Check that the original stream was stopped
+          originalStream.getTracks().forEach(track => {
+            expect(track.readyState).toEqual('ended');
+          });
           setTimeout(() => {
             expect(window.requestAnimationFrame.calls.count()).toBe(callCount);
             done();

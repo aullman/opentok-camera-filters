@@ -6,9 +6,28 @@ let videoElement;
 let videoElementLoaded = false;
 let selectedFilter;
 let initialFilter;
+let exports;
 
-// Mock out getUserMedia and replace the stream with the canvas.captureStream()
+const cleanupOriginalStream = () => {
+  if (exports && exports.originalStream) {
+    if (global.MediaStreamTrack && global.MediaStreamTrack.prototype.stop) {
+      // Newer spec
+      exports.originalStream.getTracks().forEach((track) => { track.stop(); });
+    } else {
+      // Older spec
+      exports.originalStream.stop();
+    }
+
+    exports.originalStream = null;
+  }
+};
+
+// Mock out getUserMedia and replace the original stream with the canvas.captureStream()
 mockGetUserMedia(stream => {
+  cleanupOriginalStream();
+  if (exports) {
+    exports.originalStream = stream;
+  }
   videoElement = document.createElement('video');
   videoElement.srcObject = stream;
   videoElement.setAttribute('playsinline', '');
@@ -42,7 +61,8 @@ module.exports = iFilter => {
   if (videoElementLoaded) {
     selectedFilter = initialFilter(videoElement, canvas);
   }
-  return {
+
+  exports = {
     setPublisher: publisher => {
       // We insert the canvas into the publisher element. captureStream() only works
       // with Canvas elements that are visible and in the DOM.
@@ -66,6 +86,7 @@ module.exports = iFilter => {
         if (selectedFilter) {
           selectedFilter.stop();
         }
+        cleanupOriginalStream();
       });
     },
     change: filter => {
@@ -75,4 +96,6 @@ module.exports = iFilter => {
       selectedFilter = filter(videoElement, canvas);
     },
   };
+
+  return exports;
 };
