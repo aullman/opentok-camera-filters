@@ -74,7 +74,7 @@
 	    });
 	  });
 	
-	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9MDkwNjdlZWFmODdhMDcyNTRiNWUzYzk2NDEyMGJkMzNjMTZkOWI5YTpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTA5MzIyNTEyJm5vbmNlPTAuNjYzNzM2MjY2MzE2ODQ2JnJvbGU9cHVibGlzaGVyJmV4cGlyZV90aW1lPTE1MTAxODY1MTImaW5pdGlhbF9sYXlvdXRfY2xhc3NfbGlzdD0="), err => {
+	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9M2NjY2I4OWM4YTk1ZTQxZGM5OTM2MDY5YTY2MTllZWYxOWQyOGFlZDpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTA5MzIyODk3Jm5vbmNlPTAuNzk2OTk4NDQ4MjA0MjQ5MSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTEwMTg2ODk3JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9"), err => {
 	    if (err) alert(err.message);
 	    const publisher = session.publish(null);
 	    filter.setPublisher(publisher);
@@ -11974,7 +11974,7 @@
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	const mockGetUserMedia = __webpack_require__(7);
+	/* WEBPACK VAR INJECTION */(function(global) {const mockGetUserMedia = __webpack_require__(7);
 	
 	const canvas = document.createElement('canvas');
 	canvas.getContext('2d');  // Necessary or Firefox complains
@@ -11982,9 +11982,28 @@
 	let videoElementLoaded = false;
 	let selectedFilter;
 	let initialFilter;
+	let exports;
 	
-	// Mock out getUserMedia and replace the stream with the canvas.captureStream()
+	const cleanupOriginalStream = () => {
+	  if (exports && exports.originalStream) {
+	    if (global.MediaStreamTrack && global.MediaStreamTrack.prototype.stop) {
+	      // Newer spec
+	      exports.originalStream.getTracks().forEach((track) => { track.stop(); });
+	    } else {
+	      // Older spec
+	      exports.originalStream.stop();
+	    }
+	
+	    exports.originalStream = null;
+	  }
+	};
+	
+	// Mock out getUserMedia and replace the original stream with the canvas.captureStream()
 	mockGetUserMedia(stream => {
+	  cleanupOriginalStream();
+	  if (exports) {
+	    exports.originalStream = stream;
+	  }
 	  videoElement = document.createElement('video');
 	  videoElement.srcObject = stream;
 	  videoElement.setAttribute('playsinline', '');
@@ -12018,7 +12037,8 @@
 	  if (videoElementLoaded) {
 	    selectedFilter = initialFilter(videoElement, canvas);
 	  }
-	  return {
+	
+	  exports = {
 	    setPublisher: publisher => {
 	      // We insert the canvas into the publisher element. captureStream() only works
 	      // with Canvas elements that are visible and in the DOM.
@@ -12042,6 +12062,7 @@
 	        if (selectedFilter) {
 	          selectedFilter.stop();
 	        }
+	        cleanupOriginalStream();
 	      });
 	    },
 	    change: filter => {
@@ -12051,8 +12072,11 @@
 	      selectedFilter = filter(videoElement, canvas);
 	    },
 	  };
+	
+	  return exports;
 	};
-
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }),
 /* 7 */
