@@ -3,7 +3,7 @@ module.exports = (stream, filterFn) => {
   canvas.getContext('2d');  // Necessary or Firefox complains
   let videoElementLoaded = false;
   let selectedFilter;
-  let currentFilterFn;
+  let currentFilterFn = filterFn;
 
   currentFilterFn = filterFn;
   const originalStream = stream;
@@ -15,16 +15,18 @@ module.exports = (stream, filterFn) => {
     videoElement.play();
   });
 
-  videoElement.addEventListener('loadedmetadata', () => {
+  const loadedMetadata = () => {
     videoElementLoaded = true;
     canvas.width = videoElement.videoWidth;
     canvas.height = videoElement.videoHeight;
 
     selectedFilter = currentFilterFn(videoElement, canvas);
-  });
+  };
+
+  videoElement.addEventListener('loadedmetadata', loadedMetadata);
   return {
     canvas,
-    setPublisher: publisher => {
+    setPublisher: function setPublisher(publisher) {
       // We insert the canvas into the publisher element. captureStream() only works
       // with Canvas elements that are visible and in the DOM for Chrome < 52
       // Also for Safari on iOS the video doesn't display the captureStream properly
@@ -46,6 +48,10 @@ module.exports = (stream, filterFn) => {
       publisher.on('destroyed', this.destroy);
     },
     destroy: () => {
+      if (videoElement) {
+        videoElement.pause();
+        videoElement.removeEventListener('loadedmetadata', loadedMetadata);
+      }
       // Stop running the filter
       if (selectedFilter) {
         selectedFilter.stop();

@@ -22,7 +22,6 @@ const handleError = (err) => {
   if (err) alert(err.message);
 };
 
-// Returns a Promise to a Publisher
 const publish = OT.getUserMedia().then((mediaStream) => {
   filter = filterFn(mediaStream, filters.none);
 
@@ -33,7 +32,7 @@ const publish = OT.getUserMedia().then((mediaStream) => {
     audioSource: mediaStream.getAudioTracks()[0],
   };
 
-  const publisher = OT.initPublisher('publisher', publisherOptions, exports.handleError);
+  const publisher = OT.initPublisher('publisher', publisherOptions, handleError);
   filter.setPublisher(publisher);
 
   return publisher;

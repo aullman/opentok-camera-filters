@@ -1,54 +1,67 @@
-/* global describe it expect OT beforeAll SESSION_ID TOKEN API_KEY jasmine spyOn */
+/* global describe it expect OT beforeEach afterEach SESSION_ID TOKEN API_KEY jasmine spyOn */
 const filters = require('../src/filters.js');
-const filter = require('../src/filter.js')(filters.none);
+const filterFn = require('../src/filter.js');
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
 describe('filter', () => {
-  it('defines a setPublisher method', () => {
-    expect(filter.setPublisher).toBeDefined();
+  let filter;
+  let mediaStream;
+  beforeEach((done) => {
+    OT.getUserMedia().then(stream => {
+      mediaStream = stream;
+      filter = filterFn(mediaStream, filters.none);
+    }).then(done, done.fail);
   });
 
-  it('defines a change method', () => {
+  afterEach(() => {
+    filter.destroy();
+  });
+
+  it('defines setPublisher and change methods', () => {
+    expect(filter.setPublisher).toBeDefined();
     expect(filter.change).toBeDefined();
   });
 
-  describe('OpenTok Publisher', () => {
-    beforeAll(done => {
-      const script = document.createElement('script');
-      script.src = 'https://tbdev.tokbox.com/v2/js/opentok.js';
-      script.type = 'text/javascript';
-      script.onload = done;
-      document.body.appendChild(script);
-    });
+  it('stops drawing frames and stops the stream when it is destroyed', done => {
+    spyOn(window, 'requestAnimationFrame').and.callThrough();
+    let callCount;
+    setTimeout(() => {
+      callCount = window.requestAnimationFrame.calls.count();
+      expect(callCount).toBeGreaterThan(0);
+      filter.destroy();
+    }, 500);
+    setTimeout(() => {
+      expect(window.requestAnimationFrame.calls.count()).toBe(callCount);
+      // Check that the original stream was stopped
+      mediaStream.getTracks().forEach(track => {
+        expect(track.readyState).toEqual('ended');
+      });
+      done();
+    }, 1000);
+  });
 
-    it('stops drawing frames and stops the stream when the publisher is destroyed', done => {
-      spyOn(window, 'requestAnimationFrame').and.callThrough();
-      const publisher = OT.initPublisher(err => {
+  describe('OpenTok Publisher', () => {
+    it('destroy is called when the publisher is destroyed', done => {
+      spyOn(filter, 'destroy').and.callThrough();
+      const publisher = OT.initPublisher({
+        videoSource: filter.canvas.captureStream(30).getVideoTracks()[0],
+        audioSource: mediaStream.getAudioTracks()[0],
+      }, err => {
         expect(err).toBeFalsy();
-        const originalStream = filter.originalStream;
-        expect(originalStream).toBeDefined();
         publisher.on('destroyed', () => {
-          // Check that filterTask isn't still being called after we destroyed the publisher
-          const callCount = window.requestAnimationFrame.calls.count();
-          expect(callCount).toBeGreaterThan(0);
-          // Check that the original stream was stopped
-          originalStream.getTracks().forEach(track => {
-            expect(track.readyState).toEqual('ended');
-          });
-          setTimeout(() => {
-            expect(window.requestAnimationFrame.calls.count()).toBe(callCount);
-            done();
-          }, 100);
+          expect(filter.destroy).toHaveBeenCalled();
+          done();
         });
-        setTimeout(() => {
-          publisher.destroy();
-        }, 1000);
+        publisher.destroy();
       });
       filter.setPublisher(publisher);
     });
 
     it('successfully publishes', done => {
-      const publisher = OT.initPublisher(err => {
+      const publisher = OT.initPublisher({
+        videoSource: filter.canvas.captureStream(30).getVideoTracks()[0],
+        audioSource: mediaStream.getAudioTracks()[0],
+      }, err => {
         expect(err).toBeFalsy();
         publisher.on('destroyed', done);
         publisher.destroy();
@@ -57,7 +70,10 @@ describe('filter', () => {
     });
 
     it('lets you change the filter', done => {
-      const publisher = OT.initPublisher(err => {
+      const publisher = OT.initPublisher({
+        videoSource: filter.canvas.captureStream(30).getVideoTracks()[0],
+        audioSource: mediaStream.getAudioTracks()[0],
+      }, err => {
         expect(err).toBeFalsy();
         filter.change(filters.invert);
         filter.change(filters.grayscale);
@@ -71,7 +87,10 @@ describe('filter', () => {
       const session = OT.initSession(API_KEY, SESSION_ID);
       session.connect(TOKEN, err => {
         expect(err).toBeFalsy();
-        const publisher = session.publish(pubErr => {
+        const publisher = session.publish(null, {
+          videoSource: filter.canvas.captureStream(30).getVideoTracks()[0],
+          audioSource: mediaStream.getAudioTracks()[0],
+        }, pubErr => {
           expect(pubErr).toBeFalsy();
           session.disconnect();
           done();

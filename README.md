@@ -21,20 +21,41 @@ These filters require the Canvas [captureStream API](https://developer.mozilla.o
 
 You can view the [source code for the demo](https://github.com/aullman/opentok-camera-filters/blob/gh-pages/src/demo.js) for an example of how to use this library.
 
-**Note:** Make sure you include the opentok-camera-filters code before you include opentok.js.
-
-Include the filters and then initialise with the filter you want to use.
-
 ```javascript
 const filters = require('opentok-camera-filters/src/filters.js');
-const filter = require('opentok-camera-filters')(filters.none);
+const filterFn = require('opentok-camera-filters');
 ```
 
-Then when you have a Publisher you need to set it, eg.
+Then you get your media strea you want to filter and pass it to the filter function eg.
 
 ```javascript
-const publisher = session.publish();
-filter.setPublisher(publisher);
+const publish = OT.getUserMedia().then((mediaStream) => {
+  // Initialise with filter none
+  filter = filterFn(mediaStream, filters.none);
+
+  const publisherOptions = {
+    // Pass in the canvas stream video track as our custom videoSource
+    videoSource: filter.canvas.captureStream(30).getVideoTracks()[0],
+    // Pass in the audio track from our underlying mediaStream as the audioSource
+    audioSource: mediaStream.getAudioTracks()[0],
+  };
+
+  const publisher = OT.initPublisher('publisher', publisherOptions, handleError);
+  filter.setPublisher(publisher);
+
+  return publisher;
+});
+```
+
+Then when we have successfully connected we publish the publisher to the Session.
+
+```javascript
+session.connect(TOKEN, err => {
+  if (err) handleError(err);
+  publish.then(publisher => {
+    session.publish(publisher, handleError);
+  });
+});
 ```
 
 If you want to change the filter you can use the change method, eg.
@@ -62,10 +83,21 @@ Give the video a blue tint
 
 ![blue](https://github.com/aullman/opentok-camera-filters/raw/master/images/blue.png)
 
+
+## invert
+Inverts the colour in every pixel of the video.
+
+![invert](https://github.com/aullman/opentok-camera-filters/raw/master/images/invert.png)
+
 ## grayscale
 Converts a colour from a colorspace based on an RGB color model to a grayscale representation of its luminance.
 
 ![grayscale](https://github.com/aullman/opentok-camera-filters/raw/master/images/grayscale.png)
+
+## sepia
+
+Applies a sepia tone to the image.
+![sepia](https://github.com/aullman/opentok-camera-filters/raw/master/images/sepia.png)
 
 ## blur
 A Gaussian blur (also known as Gaussian smoothing) is the result of blurring an image by a Gaussian function.
@@ -76,11 +108,6 @@ A Gaussian blur (also known as Gaussian smoothing) is the result of blurring an 
 Computes the vertical and horizontal gradients of the image and combines the computed images to find edges in the image.
 
 ![sketch](https://github.com/aullman/opentok-camera-filters/raw/master/images/sketch.png)
-
-## invert
-Inverts the colour in every pixel of the video.
-
-![invert](https://github.com/aullman/opentok-camera-filters/raw/master/images/invert.png)
 
 ## face
 Does face detection using [clmtrackr](https://github.com/auduno/clmtrackr) and draws an image on top of the face.
