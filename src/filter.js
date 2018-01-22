@@ -15,15 +15,21 @@ module.exports = (stream, filterFn) => {
     videoElement.play();
   });
 
-  const loadedMetadata = () => {
-    videoElementLoaded = true;
+  const setSize = () => {
     canvas.width = videoElement.videoWidth;
     canvas.height = videoElement.videoHeight;
+  };
+
+  const loadedMetadata = () => {
+    videoElementLoaded = true;
+    setSize();
 
     selectedFilter = currentFilterFn(videoElement, canvas);
   };
 
   videoElement.addEventListener('loadedmetadata', loadedMetadata);
+  videoElement.addEventListener('resize', setSize);
+
   return {
     canvas,
     setPublisher: function setPublisher(publisher) {

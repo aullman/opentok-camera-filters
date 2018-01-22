@@ -13,9 +13,9 @@ module.exports = function filterTask(videoElement, canvas, selectedFilter) {
     if (!tmpCanvas) {
       tmpCanvas = document.createElement('canvas');
       tmpCtx = tmpCanvas.getContext('2d');
-      tmpCanvas.width = canvas.width;
-      tmpCanvas.height = canvas.height;
     }
+    tmpCanvas.width = canvas.width;
+    tmpCanvas.height = canvas.height;
     tmpCtx.drawImage(videoElement, 0, 0, tmpCanvas.width, tmpCanvas.height);
     const imgData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
     const data = selectedFilter(imgData);
