@@ -13,7 +13,7 @@ module.exports = config => {
     frameworks: ['jasmine'],
     hostname: '127.0.0.1',
 
-    files: ['https://static.opentok.com/v2/js/opentok.min.js', '*.js'],
+    files: ['https://tbdev.tokbox.com/v2/js/opentok.min.js', '*.js'],
 
     preprocessors: {
       '*.js': ['webpack'],
