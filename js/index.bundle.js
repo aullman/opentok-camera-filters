@@ -48,7 +48,8 @@
 	// A real app would use require('opentok-filters/src/filters.js');
 	const filters = __webpack_require__(1);
 	// A real app would use require('opentok-filters')(filters.none);
-	const filter = __webpack_require__(6)(filters.none);
+	const filterFn = __webpack_require__(6);
+	let filter;
 	
 	const selector = document.querySelector('select');
 	let f;
@@ -63,21 +64,35 @@
 	  filter.change(filters[selector.value]);
 	});
 	
+	const handleError = (err) => {
+	  if (err) alert(err.message);
+	};
 	
-	// Wait for OT to load before we start using it
-	window.addEventListener('load', () => {
-	  // Simple Hello World App
-	  const session = OT.initSession(("44935341"), ("1_MX40NDkzNTM0MX5-MTQ2ODgwODY2NjQxOH56NWdGQk9OSi9wKyt5YVpqbDJUTnZOV2Z-fg"));
-	  session.on('streamCreated', event => {
-	    session.subscribe(event.stream, err => {
-	      if (err) alert(err.message);
-	    });
-	  });
+	const publish = OT.getUserMedia().then((mediaStream) => {
+	  filter = filterFn(mediaStream, filters.none);
 	
-	  session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9ZWMwZjhhMjkxNzYyYmM3Yzg0YWRmNmE3NjU4MDBlNjgyNzAwYzdiMjpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTE1NTQ3NDA4Jm5vbmNlPTAuOTM0Nzc0MTM1NzA1MDgzNiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTE2NDExNDA4JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9"), err => {
-	    if (err) alert(err.message);
-	    const publisher = session.publish(null);
-	    filter.setPublisher(publisher);
+	  const publisherOptions = {
+	    // Pass in the canvas stream video track as our custom videoSource
+	    videoSource: filter.canvas.captureStream(30).getVideoTracks()[0],
+	    // Pass in the audio track from our underlying mediaStream as the audioSource
+	    audioSource: mediaStream.getAudioTracks()[0],
+	  };
+	
+	  const publisher = OT.initPublisher('publisher', publisherOptions, handleError);
+	  filter.setPublisher(publisher);
+	
+	  return publisher;
+	});
+	
+	const session = OT.initSession(("44935341"), ("1_MX40NDkzNTM0MX5-MTQ2ODgwODY2NjQxOH56NWdGQk9OSi9wKyt5YVpqbDJUTnZOV2Z-fg"));
+	session.on('streamCreated', event => {
+	  session.subscribe(event.stream, handleError);
+	});
+	
+	session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9ZWExZDVlNDM5YzVkZWM5Njg0MzUyZmRkNmQ2NmNmMjVmZGJjZDlhMzpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTE2NjAxNDk4Jm5vbmNlPTAuMzMwOTcxODUxOTQ0OTIzNCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTE3NDY1NDk4JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9"), err => {
+	  if (err) handleError(err);
+	  publish.then(publisher => {
+	    session.publish(publisher, handleError);
 	  });
 	});
 
@@ -168,12 +183,54 @@
 	  red: colourFilter.bind(this, 150, 0, 0, 0),
 	  green: colourFilter.bind(this, 0, 150, 0, 0),
 	  blue: colourFilter.bind(this, 0, 0, 150, 0),
+	  invert: function invert(videoElement, canvas) {
+	    const filter = imgData => {
+	      const res = new Uint8ClampedArray(imgData.data.length);
+	      for (let i = 0; i < imgData.data.length; i += 4) {
+	        res[i] = 255 - imgData.data[i];
+	        res[i + 1] = 255 - imgData.data[i + 1];
+	        res[i + 2] = 255 - imgData.data[i + 2];
+	        res[i + 3] = imgData.data[i + 3];
+	      }
+	      const resData = new ImageData(res, imgData.width, imgData.height);
+	      return resData;
+	    };
+	    return filterTask(videoElement, canvas, filter);
+	  },
 	  grayscale: function grayscale(videoElement, canvas) {
 	    const filter = imgData => {
-	      const grayData = tracking.Image.grayscale(imgData.data, imgData.width, imgData.height, true);
-	      return new ImageData(grayData, imgData.width, imgData.height);
+	      const res = new Uint8ClampedArray(imgData.data.length);
+	      for (let i = 0; i < imgData.data.length; i += 4) {
+	        // Using the luminosity algorithm for grayscale 0.21 R + 0.72 G + 0.07 B
+	        // https://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
+	        const inputRed = imgData.data[i];
+	        const inputGreen = imgData.data[i + 1];
+	        const inputBlue = imgData.data[i + 2];
+	        res[i] = res[i + 1] = res[i + 2] = Math.round(
+	          0.21 * inputRed + 0.72 * inputGreen + 0.07 * inputBlue
+	        );
+	        res[i + 3] = imgData.data[i + 3];
+	      }
+	      return new ImageData(res, imgData.width, imgData.height);
 	    };
-	
+	    return filterTask(videoElement, canvas, filter);
+	  },
+	  sepia: function sepia(videoElement, canvas) {
+	    const filter = imgData => {
+	      const res = new Uint8ClampedArray(imgData.data.length);
+	      for (let i = 0; i < imgData.data.length; i += 4) {
+	        // Using the algorithm for sepia from:
+	        // https://www.techrepublic.com/blog/how-do-i/how-do-i-convert-images-to-grayscale-and-sepia-tone-using-c/
+	        const inputRed = imgData.data[i];
+	        const inputGreen = imgData.data[i + 1];
+	        const inputBlue = imgData.data[i + 2];
+	        res[i] = Math.round((inputRed * 0.393) + (inputGreen * 0.769) + (inputBlue * 0.189));
+	        res[i + 1] = Math.round((inputRed * 0.349) + (inputGreen * 0.686) + (inputBlue * 0.168));
+	        res[i + 2] = Math.round((inputRed * 0.272) + (inputGreen * 0.534) + (inputBlue * 0.131));
+	        res[i + 3] = imgData.data[i + 3];
+	      }
+	      return new ImageData(res, imgData.width, imgData.height);
+	    };
 	    return filterTask(videoElement, canvas, filter);
 	  },
 	  blur: function blur(videoElement, canvas) {
@@ -187,20 +244,6 @@
 	    const filter = imgData => {
 	      const sobelData = tracking.Image.sobel(imgData.data, imgData.width, imgData.height);
 	      return new ImageData(new Uint8ClampedArray(sobelData), imgData.width, imgData.height);
-	    };
-	    return filterTask(videoElement, canvas, filter);
-	  },
-	  invert: function invert(videoElement, canvas) {
-	    const filter = imgData => {
-	      const res = new Uint8ClampedArray(imgData.data.length);
-	      for (let i = 0; i < imgData.data.length; i += 4) {
-	        res[i] = 255 - imgData.data[i];
-	        res[i + 1] = 255 - imgData.data[i + 1];
-	        res[i + 2] = 255 - imgData.data[i + 2];
-	        res[i + 3] = imgData.data[i + 3];
-	      }
-	      const resData = new ImageData(res, imgData.width, imgData.height);
-	      return resData;
 	    };
 	    return filterTask(videoElement, canvas, filter);
 	  },
@@ -11972,84 +12015,48 @@
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {const mockGetUserMedia = __webpack_require__(7);
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = (stream, filterFn) => {
+	  const canvas = document.createElement('canvas');
+	  canvas.getContext('2d');  // Necessary or Firefox complains
+	  let videoElementLoaded = false;
+	  let selectedFilter;
+	  let currentFilterFn = filterFn;
 	
-	const canvas = document.createElement('canvas');
-	canvas.getContext('2d');  // Necessary or Firefox complains
-	let videoElement;
-	let videoElementLoaded = false;
-	let selectedFilter;
-	let initialFilter;
-	let exports;
-	
-	const cleanupOriginalStream = () => {
-	  if (exports && exports.originalStream) {
-	    if (global.MediaStreamTrack && global.MediaStreamTrack.prototype.stop) {
-	      // Newer spec
-	      exports.originalStream.getTracks().forEach((track) => { track.stop(); });
-	    } else {
-	      // Older spec
-	      exports.originalStream.stop();
-	    }
-	
-	    exports.originalStream = null;
-	  }
-	};
-	
-	// Mock out getUserMedia and replace the original stream with the canvas.captureStream()
-	mockGetUserMedia(stream => {
-	  cleanupOriginalStream();
-	  if (exports) {
-	    exports.originalStream = stream;
-	  }
-	  videoElement = document.createElement('video');
+	  currentFilterFn = filterFn;
+	  const originalStream = stream;
+	  const videoElement = document.createElement('video');
 	  videoElement.srcObject = stream;
 	  videoElement.setAttribute('playsinline', '');
 	  videoElement.muted = true;
 	  setTimeout(() => {
 	    videoElement.play();
 	  });
-	  const canvasStream = canvas.captureStream();
 	
-	  videoElement.addEventListener('loadedmetadata', () => {
+	  const loadedMetadata = () => {
+	    videoElementLoaded = true;
 	    canvas.width = videoElement.videoWidth;
 	    canvas.height = videoElement.videoHeight;
-	    videoElementLoaded = true;
 	
-	    if (initialFilter) {
-	      selectedFilter = initialFilter(videoElement, canvas);
-	    }
-	  });
-	  if (stream.getAudioTracks().length) {
-	    // Add the audio track to the stream
-	    // This actually doesn't work in Firefox until version 49
-	    // https://bugzilla.mozilla.org/show_bug.cgi?id=1271669
-	    canvasStream.addTrack(stream.getAudioTracks()[0]);
-	  }
-	  return canvasStream;
-	});
+	    selectedFilter = currentFilterFn(videoElement, canvas);
+	  };
 	
-	
-	module.exports = iFilter => {
-	  initialFilter = iFilter;
-	  if (videoElementLoaded) {
-	    selectedFilter = initialFilter(videoElement, canvas);
-	  }
-	
-	  exports = {
-	    setPublisher: publisher => {
+	  videoElement.addEventListener('loadedmetadata', loadedMetadata);
+	  return {
+	    canvas,
+	    setPublisher: function setPublisher(publisher) {
 	      // We insert the canvas into the publisher element. captureStream() only works
-	      // with Canvas elements that are visible and in the DOM.
-	      const pubEl = document.querySelector(`#${publisher.id}`);
-	      const widgetContainer = pubEl.querySelector('.OT_widget-container');
-	      let pubVid = pubEl.querySelector('.OT_widget-container video');
-	      widgetContainer.insertBefore(canvas, pubVid);
-	      canvas.style.width = '100%';
-	      canvas.style.height = '100%';
+	      // with Canvas elements that are visible and in the DOM for Chrome < 52
+	      // Also for Safari on iOS the video doesn't display the captureStream properly
+	      // https://bugs.webkit.org/show_bug.cgi?id=181663
+	      const pubEl = publisher.element;
+	      let pubVid = pubEl.querySelector('video');
 	      const setObjectFit = () => {
 	        pubVid = pubEl.querySelector('.OT_widget-container video');
+	        pubVid.parentNode.insertBefore(canvas, pubVid);
+	        canvas.style.width = '100%';
+	        canvas.style.height = '100%';
 	        canvas.style.objectFit = window.getComputedStyle(pubVid).objectFit;
 	      };
 	      if (!pubVid) {
@@ -12057,63 +12064,40 @@
 	      } else {
 	        setObjectFit();
 	      }
-	      publisher.on('destroyed', () => {
-	        // Stop running the filter
-	        if (selectedFilter) {
-	          selectedFilter.stop();
-	        }
-	        cleanupOriginalStream();
-	      });
+	      publisher.on('destroyed', this.destroy);
 	    },
-	    change: filter => {
+	    destroy: () => {
+	      if (videoElement) {
+	        videoElement.pause();
+	        videoElement.removeEventListener('loadedmetadata', loadedMetadata);
+	      }
+	      // Stop running the filter
 	      if (selectedFilter) {
 	        selectedFilter.stop();
 	      }
-	      selectedFilter = filter(videoElement, canvas);
+	      if (originalStream) {
+	        if (global.MediaStreamTrack && global.MediaStreamTrack.prototype.stop) {
+	          // Newer spec
+	          originalStream.getTracks().forEach((track) => { track.stop(); });
+	        } else {
+	          // Older spec
+	          originalStream.stop();
+	        }
+	      }
+	    },
+	    change: pFilterFn => {
+	      currentFilterFn = pFilterFn;
+	      if (selectedFilter) {
+	        selectedFilter.stop();
+	      }
+	      if (videoElementLoaded) {
+	        selectedFilter = pFilterFn(videoElement, canvas);
+	      }
 	    },
 	  };
-	
-	  return exports;
 	};
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-	// Takes a mockOnStreamAvailable function which when given a webrtcstream returns a new stream
-	// to replace it with.
-	let mockedGetUserMedia;
-	module.exports = function mockGetUserMedia(mockOnStreamAvailable) {
-	  let didMock = false;
-	
-	  ['getUserMedia', 'webkitGetUserMedia', 'mozGetUserMedia'].forEach(gumKey => {
-	    if (navigator[gumKey]) {
-	      didMock = true;
-	      const oldGetUserMedia = navigator[gumKey].bind(navigator);
-	      navigator[gumKey] = (constraints, onStreamAvailable, ...args) => (
-	        oldGetUserMedia(constraints, stream => (
-	          onStreamAvailable(mockOnStreamAvailable(stream))
-	        ), ...args)
-	      );
-	    }
-	  });
-	
-	  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-	    didMock = true;
-	    const oldGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-	    mockedGetUserMedia = constraints => (
-	      oldGetUserMedia(constraints).then(mockOnStreamAvailable)
-	    );
-	    navigator.mediaDevices.getUserMedia = mockedGetUserMedia;
-	  }
-	
-	  if (!didMock) {
-	    console.warn('Could not find getUserMedia function to mock out');
-	  }
-	};
-
 
 /***/ })
 /******/ ]);
