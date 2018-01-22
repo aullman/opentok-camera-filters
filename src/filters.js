@@ -80,12 +80,54 @@ module.exports = {
   red: colourFilter.bind(this, 150, 0, 0, 0),
   green: colourFilter.bind(this, 0, 150, 0, 0),
   blue: colourFilter.bind(this, 0, 0, 150, 0),
+  invert: function invert(videoElement, canvas) {
+    const filter = imgData => {
+      const res = new Uint8ClampedArray(imgData.data.length);
+      for (let i = 0; i < imgData.data.length; i += 4) {
+        res[i] = 255 - imgData.data[i];
+        res[i + 1] = 255 - imgData.data[i + 1];
+        res[i + 2] = 255 - imgData.data[i + 2];
+        res[i + 3] = imgData.data[i + 3];
+      }
+      const resData = new ImageData(res, imgData.width, imgData.height);
+      return resData;
+    };
+    return filterTask(videoElement, canvas, filter);
+  },
   grayscale: function grayscale(videoElement, canvas) {
     const filter = imgData => {
-      const grayData = tracking.Image.grayscale(imgData.data, imgData.width, imgData.height, true);
-      return new ImageData(grayData, imgData.width, imgData.height);
+      const res = new Uint8ClampedArray(imgData.data.length);
+      for (let i = 0; i < imgData.data.length; i += 4) {
+        // Using the luminosity algorithm for grayscale 0.21 R + 0.72 G + 0.07 B
+        // https://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
+        const inputRed = imgData.data[i];
+        const inputGreen = imgData.data[i + 1];
+        const inputBlue = imgData.data[i + 2];
+        res[i] = res[i + 1] = res[i + 2] = Math.round(
+          0.21 * inputRed + 0.72 * inputGreen + 0.07 * inputBlue
+        );
+        res[i + 3] = imgData.data[i + 3];
+      }
+      return new ImageData(res, imgData.width, imgData.height);
     };
-
+    return filterTask(videoElement, canvas, filter);
+  },
+  sepia: function sepia(videoElement, canvas) {
+    const filter = imgData => {
+      const res = new Uint8ClampedArray(imgData.data.length);
+      for (let i = 0; i < imgData.data.length; i += 4) {
+        // Using the algorithm for sepia from:
+        // https://www.techrepublic.com/blog/how-do-i/how-do-i-convert-images-to-grayscale-and-sepia-tone-using-c/
+        const inputRed = imgData.data[i];
+        const inputGreen = imgData.data[i + 1];
+        const inputBlue = imgData.data[i + 2];
+        res[i] = Math.round((inputRed * 0.393) + (inputGreen * 0.769) + (inputBlue * 0.189));
+        res[i + 1] = Math.round((inputRed * 0.349) + (inputGreen * 0.686) + (inputBlue * 0.168));
+        res[i + 2] = Math.round((inputRed * 0.272) + (inputGreen * 0.534) + (inputBlue * 0.131));
+        res[i + 3] = imgData.data[i + 3];
+      }
+      return new ImageData(res, imgData.width, imgData.height);
+    };
     return filterTask(videoElement, canvas, filter);
   },
   blur: function blur(videoElement, canvas) {
@@ -99,20 +141,6 @@ module.exports = {
     const filter = imgData => {
       const sobelData = tracking.Image.sobel(imgData.data, imgData.width, imgData.height);
       return new ImageData(new Uint8ClampedArray(sobelData), imgData.width, imgData.height);
-    };
-    return filterTask(videoElement, canvas, filter);
-  },
-  invert: function invert(videoElement, canvas) {
-    const filter = imgData => {
-      const res = new Uint8ClampedArray(imgData.data.length);
-      for (let i = 0; i < imgData.data.length; i += 4) {
-        res[i] = 255 - imgData.data[i];
-        res[i + 1] = 255 - imgData.data[i + 1];
-        res[i + 2] = 255 - imgData.data[i + 2];
-        res[i + 3] = imgData.data[i + 3];
-      }
-      const resData = new ImageData(res, imgData.width, imgData.height);
-      return resData;
     };
     return filterTask(videoElement, canvas, filter);
   },
