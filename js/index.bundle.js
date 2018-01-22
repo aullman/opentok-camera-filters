@@ -89,7 +89,7 @@
 	  session.subscribe(event.stream, handleError);
 	});
 	
-	session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9ZWExZDVlNDM5YzVkZWM5Njg0MzUyZmRkNmQ2NmNmMjVmZGJjZDlhMzpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTE2NjAxNDk4Jm5vbmNlPTAuMzMwOTcxODUxOTQ0OTIzNCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTE3NDY1NDk4JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9"), err => {
+	session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9NGZkM2VhOWE2MDM4ZmNlOGRmZjkwNjcwZjdkY2MwODU5NGEwZDE5ODpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTE2NjAyNTE4Jm5vbmNlPTAuMDg1MDA3ODgwMzQ4NzEyMiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTE3NDY2NTE4JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9"), err => {
 	  if (err) handleError(err);
 	  publish.then(publisher => {
 	    session.publish(publisher, handleError);
@@ -2756,9 +2756,9 @@
 	    if (!tmpCanvas) {
 	      tmpCanvas = document.createElement('canvas');
 	      tmpCtx = tmpCanvas.getContext('2d');
-	      tmpCanvas.width = canvas.width;
-	      tmpCanvas.height = canvas.height;
 	    }
+	    tmpCanvas.width = canvas.width;
+	    tmpCanvas.height = canvas.height;
 	    tmpCtx.drawImage(videoElement, 0, 0, tmpCanvas.width, tmpCanvas.height);
 	    const imgData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
 	    const data = selectedFilter(imgData);
@@ -12034,15 +12034,21 @@
 	    videoElement.play();
 	  });
 	
-	  const loadedMetadata = () => {
-	    videoElementLoaded = true;
+	  const setSize = () => {
 	    canvas.width = videoElement.videoWidth;
 	    canvas.height = videoElement.videoHeight;
+	  };
+	
+	  const loadedMetadata = () => {
+	    videoElementLoaded = true;
+	    setSize();
 	
 	    selectedFilter = currentFilterFn(videoElement, canvas);
 	  };
 	
 	  videoElement.addEventListener('loadedmetadata', loadedMetadata);
+	  videoElement.addEventListener('resize', setSize);
+	
 	  return {
 	    canvas,
 	    setPublisher: function setPublisher(publisher) {
