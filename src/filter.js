@@ -1,79 +1,43 @@
-const mockGetUserMedia = require('./mock-get-user-media');
+module.exports = (stream, filterFn) => {
+  const canvas = document.createElement('canvas');
+  canvas.getContext('2d');  // Necessary or Firefox complains
+  let videoElementLoaded = false;
+  let selectedFilter;
+  let currentFilterFn = filterFn;
 
-const canvas = document.createElement('canvas');
-canvas.getContext('2d');  // Necessary or Firefox complains
-let videoElement;
-let videoElementLoaded = false;
-let selectedFilter;
-let initialFilter;
-let exports;
-
-const cleanupOriginalStream = () => {
-  if (exports && exports.originalStream) {
-    if (global.MediaStreamTrack && global.MediaStreamTrack.prototype.stop) {
-      // Newer spec
-      exports.originalStream.getTracks().forEach((track) => { track.stop(); });
-    } else {
-      // Older spec
-      exports.originalStream.stop();
-    }
-
-    exports.originalStream = null;
-  }
-};
-
-// Mock out getUserMedia and replace the original stream with the canvas.captureStream()
-mockGetUserMedia(stream => {
-  cleanupOriginalStream();
-  if (exports) {
-    exports.originalStream = stream;
-  }
-  videoElement = document.createElement('video');
+  currentFilterFn = filterFn;
+  const originalStream = stream;
+  const videoElement = document.createElement('video');
   videoElement.srcObject = stream;
   videoElement.setAttribute('playsinline', '');
   videoElement.muted = true;
   setTimeout(() => {
     videoElement.play();
   });
-  const canvasStream = canvas.captureStream();
 
-  videoElement.addEventListener('loadedmetadata', () => {
+  const loadedMetadata = () => {
+    videoElementLoaded = true;
     canvas.width = videoElement.videoWidth;
     canvas.height = videoElement.videoHeight;
-    videoElementLoaded = true;
 
-    if (initialFilter) {
-      selectedFilter = initialFilter(videoElement, canvas);
-    }
-  });
-  if (stream.getAudioTracks().length) {
-    // Add the audio track to the stream
-    // This actually doesn't work in Firefox until version 49
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=1271669
-    canvasStream.addTrack(stream.getAudioTracks()[0]);
-  }
-  return canvasStream;
-});
+    selectedFilter = currentFilterFn(videoElement, canvas);
+  };
 
-
-module.exports = iFilter => {
-  initialFilter = iFilter;
-  if (videoElementLoaded) {
-    selectedFilter = initialFilter(videoElement, canvas);
-  }
-
-  exports = {
-    setPublisher: publisher => {
+  videoElement.addEventListener('loadedmetadata', loadedMetadata);
+  return {
+    canvas,
+    setPublisher: function setPublisher(publisher) {
       // We insert the canvas into the publisher element. captureStream() only works
-      // with Canvas elements that are visible and in the DOM.
-      const pubEl = document.querySelector(`#${publisher.id}`);
-      const widgetContainer = pubEl.querySelector('.OT_widget-container');
-      let pubVid = pubEl.querySelector('.OT_widget-container video');
-      widgetContainer.insertBefore(canvas, pubVid);
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
+      // with Canvas elements that are visible and in the DOM for Chrome < 52
+      // Also for Safari on iOS the video doesn't display the captureStream properly
+      // https://bugs.webkit.org/show_bug.cgi?id=181663
+      const pubEl = publisher.element;
+      let pubVid = pubEl.querySelector('video');
       const setObjectFit = () => {
         pubVid = pubEl.querySelector('.OT_widget-container video');
+        pubVid.parentNode.insertBefore(canvas, pubVid);
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
         canvas.style.objectFit = window.getComputedStyle(pubVid).objectFit;
       };
       if (!pubVid) {
@@ -81,21 +45,35 @@ module.exports = iFilter => {
       } else {
         setObjectFit();
       }
-      publisher.on('destroyed', () => {
-        // Stop running the filter
-        if (selectedFilter) {
-          selectedFilter.stop();
-        }
-        cleanupOriginalStream();
-      });
+      publisher.on('destroyed', this.destroy);
     },
-    change: filter => {
+    destroy: () => {
+      if (videoElement) {
+        videoElement.pause();
+        videoElement.removeEventListener('loadedmetadata', loadedMetadata);
+      }
+      // Stop running the filter
       if (selectedFilter) {
         selectedFilter.stop();
       }
-      selectedFilter = filter(videoElement, canvas);
+      if (originalStream) {
+        if (global.MediaStreamTrack && global.MediaStreamTrack.prototype.stop) {
+          // Newer spec
+          originalStream.getTracks().forEach((track) => { track.stop(); });
+        } else {
+          // Older spec
+          originalStream.stop();
+        }
+      }
+    },
+    change: pFilterFn => {
+      currentFilterFn = pFilterFn;
+      if (selectedFilter) {
+        selectedFilter.stop();
+      }
+      if (videoElementLoaded) {
+        selectedFilter = pFilterFn(videoElement, canvas);
+      }
     },
   };
-
-  return exports;
 };
