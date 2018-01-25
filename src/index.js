@@ -35,9 +35,11 @@ const publish = OT.getUserMedia().then((mediaStream) => {
   return new Promise((resolve, reject) => {
     const publisher = OT.initPublisher('publisher', publisherOptions, (err) => {
       if (err) reject(err);
-      else resolve(publisher);
+      else {
+        filter.setPublisher(publisher);
+        resolve(publisher);
+      }
     });
-    filter.setPublisher(publisher);
   });
 });
 
