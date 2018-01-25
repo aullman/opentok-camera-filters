@@ -78,10 +78,13 @@
 	    audioSource: mediaStream.getAudioTracks()[0],
 	  };
 	
-	  const publisher = OT.initPublisher('publisher', publisherOptions, handleError);
-	  filter.setPublisher(publisher);
-	
-	  return publisher;
+	  return new Promise((resolve, reject) => {
+	    const publisher = OT.initPublisher('publisher', publisherOptions, (err) => {
+	      if (err) reject(err);
+	      else resolve(publisher);
+	    });
+	    filter.setPublisher(publisher);
+	  });
 	});
 	
 	const session = OT.initSession(("44935341"), ("1_MX40NDkzNTM0MX5-MTQ2ODgwODY2NjQxOH56NWdGQk9OSi9wKyt5YVpqbDJUTnZOV2Z-fg"));
@@ -89,11 +92,11 @@
 	  session.subscribe(event.stream, handleError);
 	});
 	
-	session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9OGI0YWMxYzU2NzFlZDI5OTg2Nzc4M2FlY2RiYWViZmYxYzE3M2YzNjpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTE2NzU3MTExJm5vbmNlPTAuMzU3NjQ4MTEyODExMTQ4MTcmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTUxNzYyMTExMSZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=="), err => {
+	session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9NjE0ODg4OWUzNGMwM2MzODdiZWIzYTc4ODdlOGI3OTU0OTdkMmYyNTpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTE2ODQ4OTk4Jm5vbmNlPTAuODY3NzE5NjI3NDUxMTUxNiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTE3NzEyOTk4JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9"), err => {
 	  if (err) handleError(err);
 	  publish.then(publisher => {
 	    session.publish(publisher, handleError);
-	  });
+	  }).catch(handleError);
 	});
 
 
