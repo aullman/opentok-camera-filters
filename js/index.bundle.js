@@ -80,8 +80,10 @@
 	
 	  return new Promise((resolve, reject) => {
 	    const publisher = OT.initPublisher('publisher', publisherOptions, (err) => {
-	      if (err) reject(err);
-	      else {
+	      if (err) {
+	        filter.destroy();
+	        reject(err);
+	      } else {
 	        filter.setPublisher(publisher);
 	        resolve(publisher);
 	      }
@@ -94,7 +96,7 @@
 	  session.subscribe(event.stream, handleError);
 	});
 	
-	session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9NTYxMWEzN2IwYjZkNjk5NGM2YmVmOWY4MTQyMjIxYjk2YmM0MTM4ZjpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTE2ODUwMTI3Jm5vbmNlPTAuNDYxMjcxNjQxMDc3NDczNzYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTUxNzcxNDEyNyZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=="), err => {
+	session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9ZmI3YzE3ZTE2ODFlM2MyNTVlNDgxZjI1MzVkMWNkMDJlNjNmOWI1ZjpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTE2ODUwMjk4Jm5vbmNlPTAuMDY0MDY3MjcwNjA2NzU2MjEmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTUxNzcxNDI5OCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=="), err => {
 	  if (err) handleError(err);
 	  publish.then(publisher => {
 	    session.publish(publisher, handleError);
