@@ -32,10 +32,13 @@ const publish = OT.getUserMedia().then((mediaStream) => {
     audioSource: mediaStream.getAudioTracks()[0],
   };
 
-  const publisher = OT.initPublisher('publisher', publisherOptions, handleError);
-  filter.setPublisher(publisher);
-
-  return publisher;
+  return new Promise((resolve, reject) => {
+    const publisher = OT.initPublisher('publisher', publisherOptions, (err) => {
+      if (err) reject(err);
+      else resolve(publisher);
+    });
+    filter.setPublisher(publisher);
+  });
 });
 
 const session = OT.initSession(config.OT_API_KEY, config.OT_SESSION_ID);
@@ -47,5 +50,5 @@ session.connect(config.OT_TOKEN, err => {
   if (err) handleError(err);
   publish.then(publisher => {
     session.publish(publisher, handleError);
-  });
+  }).catch(handleError);
 });
