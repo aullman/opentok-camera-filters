@@ -26,7 +26,18 @@ const filters = require('opentok-camera-filters/src/filters.js');
 const filterFn = require('opentok-camera-filters');
 ```
 
-Then you get your media strea you want to filter and pass it to the filter function eg.
+If you are not using a bundler then you can use the pre-bundled files in the dist folder.
+
+```html
+  <script src="./dist/filter.js"></script>
+  <script src="./dist/filters.js"></script>
+  <script>
+    const filters = window.otfilters;
+    const filterFn = window.otfilter;
+  </script>
+```
+
+Then you get your media stream you want to filter and pass it to the filter function eg.
 
 ```javascript
 const publish = OT.getUserMedia().then((mediaStream) => {
