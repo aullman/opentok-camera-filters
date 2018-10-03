@@ -24,7 +24,7 @@ module.exports = config => {
     plugins: [
       'karma-chrome-launcher',
       'karma-firefox-launcher',
-      'karma-safaritechpreview-launcher',
+      'karma-safari-launcher',
       'karma-webpack',
       'karma-jasmine',
     ],
@@ -50,7 +50,7 @@ module.exports = config => {
         },
       },
       safari: {
-        base: 'SafariTechPreview',
+        base: 'Safari',
       },
     },
 
