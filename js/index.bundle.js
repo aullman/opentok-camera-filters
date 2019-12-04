@@ -96,7 +96,7 @@
 	  session.subscribe(event.stream, handleError);
 	});
 	
-	session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9NTVhNmQ3MzM1Yjc4MjQ4NzIwZWExYzJkMWI3OGZkYjYwZTBmZDk5NDpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTc0ODIwOTE5Jm5vbmNlPTAuODQ1MTU4MjA1MzY3NjI0OCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTc1Njg0OTE5JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9"), err => {
+	session.connect(("T1==cGFydG5lcl9pZD00NDkzNTM0MSZzaWc9OWFiMWNhOWI1ZGJhYzk4NWIyN2YzZjIyMzZhZWY2ODYwNzBkZTIxZjpzZXNzaW9uX2lkPTFfTVg0ME5Ea3pOVE0wTVg1LU1UUTJPRGd3T0RZMk5qUXhPSDU2TldkR1FrOU9TaTl3S3l0NVlWcHFiREpVVG5aT1YyWi1mZyZjcmVhdGVfdGltZT0xNTc1NDI1NzQwJm5vbmNlPTAuMTU0ODgzNTcwMjcwNjEyODQmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTU3NjI4OTc0MCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ=="), err => {
 	  if (err) handleError(err);
 	  publish.then(publisher => {
 	    session.publish(publisher, handleError);
